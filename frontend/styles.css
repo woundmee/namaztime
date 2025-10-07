@@ -1,0 +1,151 @@
+ @media (min-width: 768px) {
+    #namazTable {
+      width: 50%;
+      margin: 0 auto;
+    }
+  }
+  /* Кастомные стили для таблицы */
+  .table thead {
+    background-color: #f8f9fa;
+  }
+  [data-bs-theme="dark"] .table thead {
+    background-color: #343a40;
+  }
+  #themeToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  .active {
+    background-color: #f1f3f6 !important;
+    color: #292b2f !important;
+  }
+  [data-bs-theme="dark"] .active {
+    background-color: #495057 !important;
+    color: #f8f9fa !important;
+  }
+  @media (max-width: 768px) {
+    .table, .table thead, .table tbody, .table th, .table td {
+      font-size: 0.8rem;
+    }
+    .table th, .table td {
+      padding: 0.3rem;
+    }
+    h1 {
+      font-size: 1.8rem;
+    }
+    .lead {
+      font-size: 1rem;
+    }
+  }
+  .nav-pills .nav-link {
+    transition: all 0.3s ease;
+  }
+  .nav-pills .nav-link:hover {
+    background-color: rgba(0,123,255,0.1);
+  }
+  [data-bs-theme="dark"] .nav-pills .nav-link:hover {
+    background-color: rgba(255,255,255,0.1);
+  }
+  #mainContent, #faqContent {
+    display: none;
+  }
+  #mainContent {
+    display: block;
+  }
+
+.table-header-color {
+  background-color: #f8f9fa; /* светлый фон по умолчанию */
+  color: #212529;
+  font-weight: 600;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Темный режим для заголовков с классом table-header-color */
+[data-bs-theme="dark"] .table-header-color {
+  background-color: #343a40 !important;
+  color: #f8f9fa !important;
+  border-bottom: 1px solid #495057 !important;
+}
+
+
+#namazTable {
+  border: 1px solid #dee2e6; /* светлая граница */
+  border-radius: 15px;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: #fff; /* светлый фон таблицы */
+  color: #212529; /* цвет текста */
+}
+
+/* Заголовки таблицы для светлого режима */
+#namazTable thead th {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  color: #212529;
+  font-weight: 600;
+}
+
+/* Скругление углов заголовка */
+#namazTable thead th:first-child {
+  border-top-left-radius: 15px;
+}
+
+#namazTable thead th:last-child {
+  border-top-right-radius: 15px;
+}
+
+/* Скругление углов нижних ячеек */
+#namazTable tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 15px;
+}
+
+#namazTable tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 15px;
+}
+
+/* Границы между ячейками */
+#namazTable th, #namazTable td {
+  border-right: 1px solid #dee2e6;
+  border-bottom: 1px solid #dee2e6;
+}
+
+/* Убираем правую границу у последнего столбца */
+#namazTable th:last-child, #namazTable td:last-child {
+  border-right: none;
+}
+
+/* Убираем нижнюю границу у последней строки */
+#namazTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Темный режим */
+[data-bs-theme="dark"] #namazTable {
+  border: 1px solid #495057; /* темная граница */
+  background-color: #212529; /* темный фон таблицы */
+  color: #f8f9fa; /* светлый текст */
+}
+
+[data-bs-theme="dark"] #namazTable thead th {
+  background-color: #343a40;
+  border-bottom: 1px solid #495057;
+  color: #f8f9fa;
+}
+
+[data-bs-theme="dark"] #namazTable th, 
+[data-bs-theme="dark"] #namazTable td {
+  border-right: 1px solid #495057;
+  border-bottom: 1px solid #495057;
+}
+
+[data-bs-theme="dark"] #namazTable th:last-child, 
+[data-bs-theme="dark"] #namazTable td:last-child {
+  border-right: none;
+}
+
+[data-bs-theme="dark"] #namazTable tbody tr:last-child td {
+  border-bottom: none;
+}

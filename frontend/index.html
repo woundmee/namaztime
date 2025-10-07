@@ -1,321 +1,239 @@
-<!DOCTYPE html>
-<html lang="ru">
+<!-- #2563eb -->
 
+<!doctype html>
+<html lang="en" data-bs-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Время намаза</title>
-  <!-- Google Fonts: Inter -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>
-    body,
-    html {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      background: #f9fafb;
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      color: #1f2937;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 1rem;
-    }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Расписание намазов | Namaztime
+</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
-    /* Обёртка для карточки с возможностью горизонтальной прокрутки на узких экранах */
-    .wrapper {
-      overflow-x: auto;
-    }
-
-    .container-card {
-      background: #fff;
-      border-radius: 16px;
-      border: solid 1px #eee;
-      width: 800px;
-      /* фиксированная ширина */
-      padding: 0;
-      display: flex;
-      flex-direction: column;
-      height: 650px;
-      overflow: hidden;
-      box-sizing: border-box;
-    }
-
-    .header {
-      position: sticky;
-      top: 0;
-      background: #fff;
-      padding: 2rem 2.5rem 1rem 2.5rem;
-      z-index: 10;
-      border-bottom: 1px solid #e5e7eb;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-
-    h1 {
-      font-weight: 600;
-      font-size: 1.75rem;
-      text-align: center;
-      color: #111827;
-      margin: 0;
-      scroll-margin-top: 80px;
-    }
-
-    #btnGroup {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    button {
-      flex: 1;
-      padding: 0.6rem 1rem;
-      font-weight: 600;
-      font-size: 1rem;
-      border-radius: 12px;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition:
-        background-color 0.3s ease,
-        border-color 0.3s ease,
-        color 0.3s ease,
-        box-shadow 0.25s ease;
-      user-select: none;
-    }
-
-    button:focus-visible {
-      outline: none;
-      box-shadow: 0 0 0 3px #2563eb;
-    }
-
-    button.active {
-      background-color: #2563eb;
-      color: #fff;
-      border-color: #2563eb;
-      box-shadow: 0 4px 12px rgb(37 99 235 / 0.4);
-    }
-
-    button.inactive {
-      background-color: transparent;
-      color: #6b7280;
-      border-color: #d1d5db;
-    }
-
-    #error {
-      color: #dc2626;
-      font-weight: 600;
-      font-size: 0.9rem;
-      min-height: 1.25rem;
-      text-align: center;
-      user-select: none;
-      padding: 0 2.5rem;
-    }
-
-    #content {
-      overflow-y: auto;
-      padding: 1rem 2.5rem 2rem 2.5rem;
-      flex-grow: 1;
-      box-sizing: border-box;
-    }
-
-    table {
-      width: 100%;
-      /* таблица занимает всю ширину контейнера */
-      border-collapse: separate;
-      border-spacing: 0;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 0 0 1px #e5e7eb;
-      font-feature-settings: "tnum";
-    }
-
-    thead {
-      background-color: #f3f4f6;
-    }
-
-    thead th {
-      text-align: center;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #374151;
-      padding: 0.75rem 1rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      user-select: none;
-    }
-
-    tbody td {
-      text-align: center;
-      padding: 0.75rem 1rem;
-      color: #4b5563;
-      font-size: 1rem;
-      border-top: 1px solid #e5e7eb;
-      word-break: break-word;
-    }
-
-    tbody tr:hover td {
-      background-color: #e0e7ff;
-      color: #1e40af;
-    }
-
-    @media (max-width: 870px) {
-      .container-card {
-        width: 850px;
-        /* не меняем ширину, но появится горизонтальный скролл */
-      }
-    }
-  </style>
+<link href="styles.css" rel="stylesheet">
 </head>
-
 <body>
-  <div class="wrapper">
-    <main class="container-card" role="main" aria-label="Время намаза">
-      <div class="header">
-        <h1 class="mb-0">Время намаза</h1>
-        
-        <h6 class="text-center text-secondary" style="margin-top: -0.5rem;">
-          <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: -0.1rem" width="14" height="14" fill="currentColor"
-            class="bi bi-geo-alt" viewBox="0 0 16 16">
-            <path
-              d="M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A32 32 0 0 1 8 14.58a32 32 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10" />
-            <path d="M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4m0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
-          </svg>
-          Норильск
-        </h6>
-        <h6 class="text-center">
-          <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: -0.1rem;" width="16" height="16" fill="#2563eb"
-            class="bi bi-patch-check-fill" viewBox="0 0 16 16">
-            <path
-              d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708" />
-          </svg>
-          Официальное расписание - <a href="https://t.me/nurdkamal">источник</a>
-        </h6>
-
-        <div id="btnGroup" role="group" aria-label="Выбор периода">
-          <button id="btnToday" class="active" type="button" aria-pressed="true">Сегодня</button>
-          <button id="btnMonth" class="inactive" type="button" aria-pressed="false">Месяц</button>
-        </div>
-
-      </div>
-
-
-      <div id="error" role="alert" aria-live="polite"></div>
-      <div id="content" aria-live="polite" aria-atomic="true"></div>
-    </main>
+<header>
+  <div class="container border-bottom">
+    <header class="d-flex justify-content-center py-3">
+      <ul class="nav nav-pills">
+        <li class="nav-item"><a href="#" id="mainLink" class="nav-link text-secondary active rounded-pill" aria-current="page">Главная</a></li>
+        <li class="nav-item"><a href="#" id="faqLink" class="nav-link text-secondary rounded-pill">FAQ</a></li>
+        <li class="nav-item">
+          <button id="themeToggle" class="btn btn-link text-secondary nav-link">
+            <i id="themeIcon" class="bi bi-sun-fill"></i>
+          </button>
+        </li>
+      </ul>
+    </header>
   </div>
+</header>
 
-  <script>
-    const keyMap = {
-      Day: 'День',
-      Fajr: 'Фаджр',
-      Sunrise: 'Восход',
-      Zuhr: 'Зухр',
-      Asr: 'Аср',
-      Magrib: 'Магриб',
-      Isha: 'Иша'
-    };
+<div id="mainContent">
+  <div class="container">
+    <div class="px-4 py-5 my-3 text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" width="76" height="76" fill="currentColor" class="bi bi-clock-history" viewBox="0 0 16 16">
+        <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022zm2.004.45a7 7 0 0 0-.985-.299l.219-.976q.576.129 1.126.342zm1.37.71a7 7 0 0 0-.439-.27l.493-.87a8 8 0 0 1 .979.654l-.615.789a7 7 0 0 0-.418-.302zm1.834 1.79a7 7 0 0 0-.653-.796l.724-.69q.406.429.747.91zm.744 1.352a7 7 0 0 0-.214-.468l.893-.45a8 8 0 0 1 .45 1.088l-.95.313a7 7 0 0 0-.179-.483m.53 2.507a7 7 0 0 0-.1-1.025l.985-.17q.1.58.116 1.17zm-.131 1.538q.05-.254.081-.51l.993.123a8 8 0 0 1-.23 1.155l-.964-.267q.069-.247.12-.501m-.952 2.379q.276-.436.486-.908l.914.405q-.24.54-.555 1.038zm-.964 1.205q.183-.183.35-.378l.758.653a8 8 0 0 1-.401.432z" />
+        <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0z" />
+        <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5" />
+      </svg>
 
-    // Функция создания таблицы для массива (месяц)
-    function createTable(data) {
-      if (!Array.isArray(data)) return null;
-      if (data.length === 0) return '<p class="text-center text-muted">Нет данных за месяц</p>';
+      <h1 class="display-5 fw-bold">Расписание намазов</h1>
+      <div class="col-lg-6 mx-auto">
+        <p class="lead mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: -0.1rem;" width="16" height="16" fill="#2563eb" class="bi bi-patch-check-fill" viewBox="0 0 16 16">
+            <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708" />
+          </svg>
+          Официально по городу Норильск
+        </p>
 
-      const keys = Object.keys(data[0]);
-      let html = '<table><thead><tr>';
-      keys.forEach(key => {
-        const header = keyMap[key] || key;
-        html += `<th scope="col">${header}</th>`;
-      });
-      html += '</tr></thead><tbody>';
-      data.forEach(row => {
-        html += '<tr>';
-        keys.forEach(key => {
-          html += `<td>${row[key]}</td>`;
-        });
-        html += '</tr>';
-      });
-      html += '</tbody></table>';
-      return html;
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+          <button id="btnToday" type="button" class="btn btn-primary px-4 rounded-pill">Сегодня</button>
+          <button id="btnMonth" type="button" class="btn btn-outline-primary px-4 rounded-pill">Месяц</button>
+        </div>
+      </div>
+    </div>
+
+    <table id="namazTable" class="table mb-5 text-center" style="border-radius: 15px; overflow: hidden;">
+      <thead class="">
+        <tr>
+          <th class="table-header-color" scope="col">День</th>
+          <th class="table-header-color" scope="col">Фаджр</th>
+          <th class="table-header-color" scope="col">Восход</th>
+          <th class="table-header-color" scope="col">Зухр</th>
+          <th class="table-header-color" scope="col">Аср</th>
+          <th class="table-header-color" scope="col">Магриб</th>
+          <th class="table-header-color" scope="col">Иша</th>
+        </tr>
+      </thead>
+      <tbody id="namazTableBody" class="border">
+        <!-- Данные будут загружаться сюда -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- =========================== -->
+<!-- PAGE: FAQ: ВОПРОСЫ И ОТВЕТЫ -->
+<!-- =========================== -->
+
+<div id="faqContent" class="container my-5">
+  <h1 class="text-center mb-4">Часто задаваемые вопросы</h1>
+  
+  <div class="accordion" id="faqAccordion">
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne">
+          Что это за сайт?
+        </button>
+      </h2>
+      <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Это веб-приложение для получения расписания намазов по г. Норильск. Расписание официальное и берется с официального <a href="https://t.me/nurdkamal">telegram-канала</a> "Нурд-Камал".
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
+          Как я могу распечатать расписание?
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Пока такой возможности нет. Попробуйте через встроенные возможности самого браузера (CTRL+P для Google Chrome), но это не гарантирует вам удобной и красивой разметки таблицы с расписанием намазов.
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree">
+          Для разработчиков
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+        <div class="accordion-body">
+          Приложение написано на основе REST API протокола. 
+          Чтобы получить расписание намазов за текущий день по г. Норильск, необходимо отправить GET-запрос по url: <code>/namaztime/today</code>.
+          Чтобы получить расписание намазов за весь текущий месяц, необходимо отправить GET-запрос по url: <code>/namaztime/month</code>
+          <br>
+          <br>
+          ℹ Проект полностью open-source. Если есть предложения, улучшения или нашли ошибку - создайте issue или сделайте fork через Pull-request.
+          <a href="https://github.com/woundmee/namaztime-api/">Ссылка на проект (Gitub)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Функция для загрузки данных
+  async function fetchNamazData(endpoint) {
+    try {
+      const response = await fetch(`http://localhost:8080${endpoint}`);
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+      return null;
     }
+  }
 
-    // Новая функция для "Сегодня" — таблица с заголовками сверху и одной строкой данных
-    function createSingleTable(obj) {
-      if (typeof obj !== 'object' || obj === null) return null;
-      const keys = Object.keys(obj);
-      let html = '<table><thead><tr>';
-      keys.forEach(key => {
-        const header = keyMap[key] || key;
-        html += `<th scope="col">${header}</th>`;
-      });
-      html += '</tr></thead><tbody><tr>';
-      keys.forEach(key => {
-        html += `<td>${obj[key]}</td>`;
-      });
-      html += '</tr></tbody></table>';
-      return html;
-    }
+  // Функция для отрисовки данных в таблице
+  function renderNamazTable(data) {
+    const tableBody = document.getElementById('namazTableBody');
+    tableBody.innerHTML = ''; // Очищаем таблицу
 
-    async function fetchNamaz(url) {
-      const errorDiv = document.getElementById('error');
-      const contentDiv = document.getElementById('content');
-      errorDiv.textContent = '';
-      contentDiv.innerHTML = '<p class="text-center" style="color:#6b7280;">Загрузка...</p>';
+    // Проверяем, является ли data массивом или объектом
+    const dataToRender = Array.isArray(data) ? data : [data];
 
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          throw new Error(`Ошибка HTTP: ${response.status}`);
-        }
-        const data = await response.json();
-
-        if (Array.isArray(data)) {
-          contentDiv.innerHTML = createTable(data);
-        } else {
-          contentDiv.innerHTML = createSingleTable(data);
-        }
-      } catch (err) {
-        contentDiv.innerHTML = '';
-        errorDiv.textContent = 'Ошибка при загрузке данных: ' + err.message;
-      }
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      const btnToday = document.getElementById('btnToday');
-      const btnMonth = document.getElementById('btnMonth');
-
-      function setActive(buttonToActivate, buttonToDeactivate) {
-        buttonToActivate.classList.add('active');
-        buttonToActivate.classList.remove('inactive');
-        buttonToActivate.setAttribute('aria-pressed', 'true');
-
-        buttonToDeactivate.classList.add('inactive');
-        buttonToDeactivate.classList.remove('active');
-        buttonToDeactivate.setAttribute('aria-pressed', 'false');
-      }
-
-      btnToday.addEventListener('click', () => {
-        if (btnToday.classList.contains('active')) return;
-        setActive(btnToday, btnMonth);
-        fetchNamaz('http://localhost:8080/namaztime/today');
-      });
-
-      btnMonth.addEventListener('click', () => {
-        if (btnMonth.classList.contains('active')) return;
-        setActive(btnMonth, btnToday);
-        fetchNamaz('http://localhost:8080/namaztime/month');
-      });
-
-      // Автозагрузка "Сегодня"
-      fetchNamaz('http://localhost:8080/namaztime/today');
+    dataToRender.forEach(item => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <th scope="row">${item.Day}</th>
+        <td>${item.Fajr}</td>
+        <td>${item.Sunrise}</td>
+        <td>${item.Zuhr}</td>
+        <td>${item.Asr}</td>
+        <td>${item.Magrib}</td>
+        <td>${item.Isha}</td>
+      `;
+      tableBody.appendChild(row);
     });
-  </script>
+  }
 
-  <!-- Bootstrap JS Bundle -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  // Обработчики кнопок
+  const btnToday = document.getElementById('btnToday');
+  const btnMonth = document.getElementById('btnMonth');
+
+  btnToday.addEventListener('click', async () => {
+    const data = await fetchNamazData('/namaztime/today');
+    if (data) {
+      renderNamazTable(data);
+      btnToday.classList.replace('btn-outline-primary', 'btn-primary');
+      btnMonth.classList.replace('btn-primary', 'btn-outline-primary');
+    }
+  });
+
+  btnMonth.addEventListener('click', async () => {
+    const data = await fetchNamazData('/namaztime/month');
+    if (data) {
+      renderNamazTable(data);
+      btnMonth.classList.replace('btn-outline-primary', 'btn-primary');
+      btnToday.classList.replace('btn-primary', 'btn-outline-primary');
+    }
+  });
+
+  // Переключение темы
+  const themeToggle = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const htmlElement = document.documentElement;
+
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = htmlElement.getAttribute('data-bs-theme');
+    
+    if (currentTheme === 'light') {
+      htmlElement.setAttribute('data-bs-theme', 'dark');
+      themeIcon.classList.remove('bi-sun-fill');
+      themeIcon.classList.add('bi-moon-fill');
+    } else {
+      htmlElement.setAttribute('data-bs-theme', 'light');
+      themeIcon.classList.remove('bi-moon-fill');
+      themeIcon.classList.add('bi-sun-fill');
+    }
+  });
+
+  // Навигация между страницами
+  const mainLink = document.getElementById('mainLink');
+  const faqLink = document.getElementById('faqLink');
+  const mainContent = document.getElementById('mainContent');
+  const faqContent = document.getElementById('faqContent');
+
+  mainLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    mainContent.style.display = 'block';
+    faqContent.style.display = 'none';
+    mainLink.classList.add('active');
+    faqLink.classList.remove('active');
+  });
+
+  faqLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    mainContent.style.display = 'none';
+    faqContent.style.display = 'block';
+    faqLink.classList.add('active');
+    mainLink.classList.remove('active');
+  });
+
+  // Автоматическая загрузка данных при загрузке страницы
+  document.addEventListener('DOMContentLoaded', async () => {
+    const data = await fetchNamazData('/namaztime/today');
+    if (data) renderNamazTable(data);
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
