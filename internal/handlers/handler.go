@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
-	"namaztimeApi/internal/configs/slogger"
 	"namaztimeApi/internal/services"
 
 	"github.com/labstack/echo/v4"
@@ -23,14 +23,14 @@ const PATH_SCHEDULES = "./schedules/"
 func searchCurrentMonthSchedule(path string) (string, error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
-		slogger.Log.Error("Не удалось получить список файлов", "error", err)
+		slog.Error("Не удалось получить список файлов", "error", err)
 		return "", err
 	}
 
 	currentMonthInt := int(time.Now().Month())
 	for _, file := range files {
 		if strings.Contains(file.Name(), strconv.Itoa(currentMonthInt)) {
-			slogger.Log.Info("Файл найден", "filename", file.Name())
+			slog.Info("Файл найден", "filename", file.Name())
 			return file.Name(), nil
 		}
 	}
@@ -42,7 +42,7 @@ func searchCurrentMonthSchedule(path string) (string, error) {
 func fullPathToMonthSchedule() (string, error) {
 	filename, err := searchCurrentMonthSchedule(PATH_SCHEDULES)
 	if err != nil {
-		slogger.Log.Error("Файл не найден", "error", err)
+		slog.Error("Файл не найден", "error", err)
 		return "", err
 	}
 	return PATH_SCHEDULES + filename, nil
@@ -52,18 +52,18 @@ func fullPathToMonthSchedule() (string, error) {
 func GetNamazDataHandler(c echo.Context) error {
 	fp, err := fullPathToMonthSchedule()
 	if err != nil {
-		slogger.Log.Error("Не удалось получить полный путь до файла", "error", err)
+		slog.Error("Не удалось получить полный путь до файла", "error", err)
 	}
 
 	fr, err := services.NamazDataMonth(fp)
 	if err != nil {
-		slogger.Log.Error("Ошибка получения расписания намазов за месяц", "error", err, "http", http.StatusInternalServerError)
+		slog.Error("Ошибка получения расписания намазов за месяц", "error", err, "http", http.StatusInternalServerError)
 		return c.JSON(http.StatusInternalServerError, map[string]string{
 			"error": "Не удалось получить данные",
 		})
 	}
 
-	slogger.Log.Info("Расписание за месяц получено", "http", http.StatusOK)
+	slog.Info("Расписание за месяц получено", "http", http.StatusOK)
 	return c.JSON(http.StatusOK, fr)
 }
 
@@ -78,21 +78,21 @@ func GetNamazDataFilteredHandler(c echo.Context) error {
 
 	day, err := currentDayInt()
 	if err != nil {
-		slogger.Log.Error("Не удалось получить текущий день", "error", err)
+		slog.Error("Не удалось получить текущий день", "error", err)
 		return err
 	}
 
 	fp, err := fullPathToMonthSchedule()
 	if err != nil {
-		slogger.Log.Error("Не удалось получить полный путь до файла", "error", err)
+		slog.Error("Не удалось получить полный путь до файла", "error", err)
 	}
 
 	res, err := services.NamazDataToday(day, fp)
 	if err != nil {
-		slogger.Log.Error("Не удалось получить расписание намазов за текущий день", "error", err)
+		slog.Error("Не удалось получить расписание намазов за текущий день", "error", err)
 		return err
 	}
 
-	slogger.Log.Info("Расписание на текущий день получено", "http", http.StatusOK)
+	slog.Info("Расписание на текущий день получено", "http", http.StatusOK)
 	return c.JSON(http.StatusOK, res)
 }

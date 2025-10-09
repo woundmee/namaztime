@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log/slog"
 	"namaztimeApi/internal/configs/slogger"
 	"namaztimeApi/internal/handlers"
 
@@ -18,7 +19,7 @@ func main() {
 		panic("Не удалось инициализировать логгер: " + err.Error())
 	}
 
-	slogger.Log.Info("Создаю новый echo-сервер")
+	slog.Info("Создаю новый echo-сервер")
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
@@ -28,6 +29,6 @@ func main() {
 	e.GET("/namaztime/today", handlers.GetNamazDataFilteredHandler)
 
 	// localhost:8080 - get from ENV
-	slogger.Log.Info("Начинаю запуск приложения", "address", ADDRESS)
+	slog.Info("Начинаю запуск приложения", "address", ADDRESS)
 	e.Start(ADDRESS)
 }

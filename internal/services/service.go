@@ -4,7 +4,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
-	"log"
+	"log/slog"
 	"os"
 	"strconv"
 )
@@ -24,17 +24,20 @@ type NamazTime struct {
 func NamazDataMonth(path string) ([]NamazTime, error) {
 	file, err := os.Open(path)
 	if err != nil {
+		slog.Error("", "error", err)
 		return nil, fmt.Errorf("не удалось открыть файл: %w", err)
 	}
 
 	defer file.Close()
 
+	slog.Info("начинаю читать файл", "filename", file.Name())
 	csvReader := csv.NewReader(file)
 
 	// пропускаю заголовки
 	_, err = csvReader.Read()
 	if err != nil {
-		return nil, fmt.Errorf("ошибка чтения заголовка: %v", err)
+		slog.Error("ошибка чтения заголовка csv-файла", "error", err)
+		return nil, fmt.Errorf("ошибка чтения заголовка csv-файла: %v", err)
 	}
 
 	var data []NamazTime
@@ -45,7 +48,8 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 			if err == io.EOF {
 				break
 			}
-			return nil, fmt.Errorf("ошибка чтения: %v", err)
+			slog.Error("ошибка чтения файла", "error", err)
+			return nil, fmt.Errorf("ошибка чтения файла: %v", err)
 		}
 
 		nt := NamazTime{
@@ -60,20 +64,22 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 
 		data = append(data, nt)
 	}
-
 	return data, nil
 }
 
 // получить расписание намазов за текущий день
 func NamazDataToday(day int, path string) (NamazTime, error) {
+	slog.Info("получаю расписание за месяц для дальнейшей обработки...")
 	data, err := NamazDataMonth(path)
 	if err != nil {
-		log.Fatalf("Ошибка получения данных: %v", err)
-		return NamazTime{}, fmt.Errorf("")
+		slog.Error("ошибка получения данных", "error", err)
+		return NamazTime{}, fmt.Errorf("ошибка получения данных: %v", err)
 	}
 
+	slog.Info("начинаю перебор расписания на получения расписания текущего дня")
 	for _, d := range data {
 		if d.Day == strconv.Itoa(day) {
+			slog.Info("расписание на текущий день найдено", "day", d.Day)
 			d = NamazTime{
 				Day:     d.Day,
 				Fajr:    d.Fajr,
@@ -88,5 +94,6 @@ func NamazDataToday(day int, path string) (NamazTime, error) {
 		}
 	}
 
+	slog.Error("расписание на текущий день не найдено", "day", day)
 	return NamazTime{}, fmt.Errorf("данные за день %d не найдены", day)
 }
