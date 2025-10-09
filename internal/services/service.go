@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/csv"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"strconv"
@@ -23,8 +24,7 @@ type NamazTime struct {
 func NamazDataMonth(path string) ([]NamazTime, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		log.Fatalf("Не удалось открыть файл: %v", err)
-		return []NamazTime{}, err
+		return nil, fmt.Errorf("не удалось открыть файл: %w", err)
 	}
 
 	defer file.Close()
@@ -34,8 +34,7 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 	// пропускаю заголовки
 	_, err = csvReader.Read()
 	if err != nil {
-		fmt.Printf("Ошибка чтения заголовка: %v", err)
-		return []NamazTime{}, err
+		return nil, fmt.Errorf("ошибка чтения заголовка: %v", err)
 	}
 
 	var data []NamazTime
@@ -43,11 +42,10 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 	for {
 		record, err := csvReader.Read()
 		if err != nil {
-			if err.Error() == "EOF" {
+			if err == io.EOF {
 				break
 			}
-			log.Fatalf("Ошибка чтения: %v", err)
-			return []NamazTime{}, err
+			return nil, fmt.Errorf("ошибка чтения: %v", err)
 		}
 
 		nt := NamazTime{
@@ -71,11 +69,12 @@ func NamazDataToday(day int, path string) (NamazTime, error) {
 	data, err := NamazDataMonth(path)
 	if err != nil {
 		log.Fatalf("Ошибка получения данных: %v", err)
+		return NamazTime{}, fmt.Errorf("")
 	}
 
 	for _, d := range data {
 		if d.Day == strconv.Itoa(day) {
-			nt := NamazTime{
+			d = NamazTime{
 				Day:     d.Day,
 				Fajr:    d.Fajr,
 				Sunrise: d.Sunrise,
@@ -85,9 +84,9 @@ func NamazDataToday(day int, path string) (NamazTime, error) {
 				Isha:    d.Isha,
 			}
 
-			return nt, nil
+			return d, nil
 		}
 	}
 
-	return NamazTime{}, err
+	return NamazTime{}, fmt.Errorf("данные за день %d не найдены", day)
 }
