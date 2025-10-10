@@ -3,6 +3,7 @@ module namaztimeApi
 go 1.25.0
 
 require (
+	github.com/fatih/color v1.18.0
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
