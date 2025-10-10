@@ -1,4 +1,42 @@
- @media (min-width: 768px) {
+
+/* === PRINT === */
+
+
+
+/* Основные стили для печати */
+@media print {
+  /* Скрываем всё кроме таблицы */
+  body * {
+      display: none;
+  }
+  
+  #namazTable {
+      display: table !important;
+      width: 100% !important;
+      font-size: 14px !important;
+  }
+  
+  #namazTable th,
+  #namazTable td {
+      border: 1px solid #000 !important;
+      padding: 6px !important;
+  }
+  
+  /* Заголовок для печати */
+  #namazTable::before {
+      content: "Время намаза";
+      display: block;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 15px;
+  }
+}
+
+
+/* =================== */
+
+@media (min-width: 768px) {
     #namazTable {
       width: 50%;
       margin: 0 auto;

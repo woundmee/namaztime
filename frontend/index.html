@@ -3,12 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Расписание намазов | Namaztime
+<title>Расписание намазов | Namaznsk.ru
 </title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
 
 <link href="styles.css" rel="stylesheet">
+<link rel="icon" href="favicon.svg" sizes="any" type="image/svg+xml">
+
 </head>
 <body>
 
@@ -37,8 +39,8 @@
         <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5" />
       </svg>
 
-      <h1 class="display-5 fw-bold">Расписание намазов</h1>
-      <div class="col-lg-6 mx-auto">
+      <h1 class="display-5 mt-3 fw-bold">Расписание намазов</h1>
+      <div class="col-lg-6 mt-0 mx-auto">
         <p class="lead mb-4">
           <svg xmlns="http://www.w3.org/2000/svg" style="margin-top: -0.1rem;" width="16" height="16" fill="#2563eb" class="bi bi-patch-check-fill" viewBox="0 0 16 16">
             <path d="M10.067.87a2.89 2.89 0 0 0-4.134 0l-.622.638-.89-.011a2.89 2.89 0 0 0-2.924 2.924l.01.89-.636.622a2.89 2.89 0 0 0 0 4.134l.637.622-.011.89a2.89 2.89 0 0 0 2.924 2.924l.89-.01.622.636a2.89 2.89 0 0 0 4.134 0l.622-.637.89.011a2.89 2.89 0 0 0 2.924-2.924l-.01-.89.636-.622a2.89 2.89 0 0 0 0-4.134l-.637-.622.011-.89a2.89 2.89 0 0 0-2.924-2.924l-.89.01zm.287 5.984-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7 8.793l2.646-2.647a.5.5 0 0 1 .708.708" />
@@ -49,9 +51,13 @@
         <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
           <button id="btnToday" type="button" class="btn btn-primary px-4 rounded-pill">Сегодня</button>
           <button id="btnMonth" type="button" class="btn btn-outline-primary px-4 rounded-pill">Месяц</button>
+          
+          <button onclick="printTable()" class="no-print btn btn-outline-secondary px-4 rounded-pill">Распечатать</button> <!-- Кнопка для печати -->
+          <script src="printTable.js"></script>
         </div>
       </div>
     </div>
+
 
     <table id="namazTable" class="table mb-5 text-center" style="border-radius: 15px; overflow: hidden;">
       <thead class="">
@@ -88,7 +94,7 @@
       </h2>
       <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Это веб-приложение для получения расписания намазов по г. Норильск. Расписание официальное и берется с официального <a href="https://t.me/nurdkamal">telegram-канала</a> "Нурд-Камал".
+          Это веб-приложение для получения расписания намазов по г. Норильск. Расписание берётся с официального <a href="https://t.me/nurdkamal">telegram-канала</a> мечети "Нурд-Камал".
         </div>
       </div>
     </div>
@@ -96,12 +102,15 @@
     <div class="accordion-item">
       <h2 class="accordion-header">
         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo">
-          Как я могу распечатать расписание?
+          Как распечатать расписание?
         </button>
       </h2>
       <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Пока такой возможности нет. Попробуйте через встроенные возможности самого браузера (CTRL+P для Google Chrome), но это не гарантирует вам удобной и красивой разметки таблицы с расписанием намазов.
+          Чтобы распечатать расписание за весь месяц, необходимо сначала нажать на кнопку <button class="btn btn-outline-primary btn-sm rounded-pill">Месяц</button>,
+          а затем на кнопку <button class="btn btn-outline-secondary btn-sm rounded-pill">Распечатать</button> рядом с ней. В браузере откроется форма печати. Если по каким-то причинам таблица не вмешается в 1 лист формата А4, необходимо скорректировать параметры скалирования (Scale). По умолчанию оно = 100. Уменьшите до тех пор, пока таблица полностью не вместится в рамках 1 листа А4.
+          <br><br>  
+          ☑️ Для распечатки советую использовать ПК/Ноутбук с установленным браузером Google Chrome.
         </div>
       </div>
     </div>
@@ -114,124 +123,19 @@
       </h2>
       <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
         <div class="accordion-body">
-          Приложение написано на основе REST API протокола. 
-          Чтобы получить расписание намазов за текущий день по г. Норильск, необходимо отправить GET-запрос по url: <code>/namaztime/today</code>.
-          Чтобы получить расписание намазов за весь текущий месяц, необходимо отправить GET-запрос по url: <code>/namaztime/month</code>
+          Приложение написано на основе REST API протокола. Вы можете получить расписание намазов по г. Норильск и внедрить в свои проекты.
+          Для получения расписания за весь месяц: <code>GET /namaztime/month</code>, для текущего дня: <code>GET /namaztime/today</code>
+          <br><br>
+          ⚙️ Проект полностью open-source. Если есть предложения, улучшения или нашли ошибку - создайте issue или сделайте fork через Pull-request.
           <br>
-          <br>
-          ℹ Проект полностью open-source. Если есть предложения, улучшения или нашли ошибку - создайте issue или сделайте fork через Pull-request.
-          <a href="https://github.com/woundmee/namaztime-api/">Ссылка на проект (Gitub)</a>
+          🖇️ <a href="https://github.com/woundmee/namaztime-api/">Ссылка на проект (Gitub)</a>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<script>
-  // Функция для загрузки данных
-  async function fetchNamazData(endpoint) {
-    try {
-      const response = await fetch(`http://localhost:8080${endpoint}`);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Ошибка загрузки данных:', error);
-      return null;
-    }
-  }
-
-  // Функция для отрисовки данных в таблице
-  function renderNamazTable(data) {
-    const tableBody = document.getElementById('namazTableBody');
-    tableBody.innerHTML = ''; // Очищаем таблицу
-
-    // Проверяем, является ли data массивом или объектом
-    const dataToRender = Array.isArray(data) ? data : [data];
-
-    dataToRender.forEach(item => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <th scope="row">${item.Day}</th>
-        <td>${item.Fajr}</td>
-        <td>${item.Sunrise}</td>
-        <td>${item.Zuhr}</td>
-        <td>${item.Asr}</td>
-        <td>${item.Magrib}</td>
-        <td>${item.Isha}</td>
-      `;
-      tableBody.appendChild(row);
-    });
-  }
-
-  // Обработчики кнопок
-  const btnToday = document.getElementById('btnToday');
-  const btnMonth = document.getElementById('btnMonth');
-
-  btnToday.addEventListener('click', async () => {
-    const data = await fetchNamazData('/namaztime/today');
-    if (data) {
-      renderNamazTable(data);
-      btnToday.classList.replace('btn-outline-primary', 'btn-primary');
-      btnMonth.classList.replace('btn-primary', 'btn-outline-primary');
-    }
-  });
-
-  btnMonth.addEventListener('click', async () => {
-    const data = await fetchNamazData('/namaztime/month');
-    if (data) {
-      renderNamazTable(data);
-      btnMonth.classList.replace('btn-outline-primary', 'btn-primary');
-      btnToday.classList.replace('btn-primary', 'btn-outline-primary');
-    }
-  });
-
-  // Переключение темы
-  const themeToggle = document.getElementById('themeToggle');
-  const themeIcon = document.getElementById('themeIcon');
-  const htmlElement = document.documentElement;
-
-  themeToggle.addEventListener('click', () => {
-    const currentTheme = htmlElement.getAttribute('data-bs-theme');
-    
-    if (currentTheme === 'light') {
-      htmlElement.setAttribute('data-bs-theme', 'dark');
-      themeIcon.classList.remove('bi-sun-fill');
-      themeIcon.classList.add('bi-moon-fill');
-    } else {
-      htmlElement.setAttribute('data-bs-theme', 'light');
-      themeIcon.classList.remove('bi-moon-fill');
-      themeIcon.classList.add('bi-sun-fill');
-    }
-  });
-
-  // Навигация между страницами
-  const mainLink = document.getElementById('mainLink');
-  const faqLink = document.getElementById('faqLink');
-  const mainContent = document.getElementById('mainContent');
-  const faqContent = document.getElementById('faqContent');
-
-  mainLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    mainContent.style.display = 'block';
-    faqContent.style.display = 'none';
-    mainLink.classList.add('active');
-    faqLink.classList.remove('active');
-  });
-
-  faqLink.addEventListener('click', (e) => {
-    e.preventDefault();
-    mainContent.style.display = 'none';
-    faqContent.style.display = 'block';
-    faqLink.classList.add('active');
-    mainLink.classList.remove('active');
-  });
-
-  // Автоматическая загрузка данных при загрузке страницы
-  document.addEventListener('DOMContentLoaded', async () => {
-    const data = await fetchNamazData('/namaztime/today');
-    if (data) renderNamazTable(data);
-  });
-</script>
+<script src="fetchNamazData.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
 </body>
