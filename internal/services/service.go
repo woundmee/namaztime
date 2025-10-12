@@ -5,42 +5,50 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"namaztimeApi/models"
 	"os"
 	"strconv"
 )
 
 // здесь будут сервисы (бизнес-логика).
-type NamazTime struct {
-	Day     string
-	Fajr    string
-	Sunrise string
-	Zuhr    string
-	Asr     string
-	Magrib  string
-	Isha    string
+
+type NamazData interface {
+	NamazDataMonth(path string) ([]models.NamazTime, error)
+	NamazDataToday(day int, path string) (*models.NamazTime, error)
+}
+
+type Service struct {
+	logger *slog.Logger
+}
+
+// конструктор
+func New(log *slog.Logger) *Service {
+	return &Service{
+		logger: log,
+	}
 }
 
 // получить расписание намазов за месяц
-func NamazDataMonth(path string) ([]NamazTime, error) {
+func (s *Service) NamazDataMonth(path string) ([]models.NamazTime, error) {
 	file, err := os.Open(path)
 	if err != nil {
-		slog.Error("", "error", err)
+		s.logger.Error("", "error", err)
 		return nil, fmt.Errorf("не удалось открыть файл: %w", err)
 	}
 
 	defer file.Close()
 
-	slog.Info("начинаю читать файл", "filename", file.Name())
+	s.logger.Info("начинаю читать файл", "filename", file.Name())
 	csvReader := csv.NewReader(file)
 
 	// пропускаю заголовки
 	_, err = csvReader.Read()
 	if err != nil {
-		slog.Error("ошибка чтения заголовка csv-файла", "error", err)
+		s.logger.Error("ошибка чтения заголовка csv-файла", "error", err)
 		return nil, fmt.Errorf("ошибка чтения заголовка csv-файла: %v", err)
 	}
 
-	var data []NamazTime
+	var data []models.NamazTime
 
 	for {
 		record, err := csvReader.Read()
@@ -48,11 +56,11 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 			if err == io.EOF {
 				break
 			}
-			slog.Error("ошибка чтения файла", "error", err)
+			s.logger.Error("ошибка чтения файла", "error", err)
 			return nil, fmt.Errorf("ошибка чтения файла: %v", err)
 		}
 
-		nt := NamazTime{
+		data = append(data, models.NamazTime{
 			Day:     record[0],
 			Fajr:    record[1],
 			Sunrise: record[2],
@@ -60,40 +68,29 @@ func NamazDataMonth(path string) ([]NamazTime, error) {
 			Asr:     record[4],
 			Magrib:  record[5],
 			Isha:    record[6],
-		}
-
-		data = append(data, nt)
+		})
 	}
 	return data, nil
 }
 
 // получить расписание намазов за текущий день
-func NamazDataToday(day int, path string) (NamazTime, error) {
-	slog.Info("получаю расписание за месяц для дальнейшей обработки...")
-	data, err := NamazDataMonth(path)
+func (s *Service) NamazDataToday(day int, path string) (*models.NamazTime, error) {
+	s.logger.Info("получаю расписание за месяц для дальнейшей обработки...")
+
+	data, err := s.NamazDataMonth(path)
 	if err != nil {
-		slog.Error("ошибка получения данных", "error", err)
-		return NamazTime{}, fmt.Errorf("ошибка получения данных: %v", err)
+		s.logger.Error("ошибка получения данных", "error", err)
+		return nil, fmt.Errorf("ошибка получения данных: %v", err)
 	}
 
-	slog.Info("начинаю перебор расписания на получения расписания текущего дня")
+	s.logger.Info("начинаю перебор расписания на получения расписания текущего дня")
 	for _, d := range data {
 		if d.Day == strconv.Itoa(day) {
-			slog.Info("расписание на текущий день найдено", "day", d.Day)
-			d = NamazTime{
-				Day:     d.Day,
-				Fajr:    d.Fajr,
-				Sunrise: d.Sunrise,
-				Zuhr:    d.Zuhr,
-				Asr:     d.Asr,
-				Magrib:  d.Magrib,
-				Isha:    d.Isha,
-			}
-
-			return d, nil
+			s.logger.Info("расписание на текущий день найдено", "day", d.Day)
+			return &d, nil
 		}
 	}
 
-	slog.Error("расписание на текущий день не найдено", "day", day)
-	return NamazTime{}, fmt.Errorf("данные за день %d не найдены", day)
+	s.logger.Error("расписание на текущий день не найдено", "day", day)
+	return nil, fmt.Errorf("данные за день %d не найдены", day)
 }

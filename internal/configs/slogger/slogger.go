@@ -7,17 +7,18 @@ import (
 
 // var Log *slog.Logger
 
-func Init(logFilePath string) error {
+func Init(logFilePath string) (*slog.Logger, error) {
 	f, err := os.OpenFile(logFilePath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0644) // 0644: -rw-r--r--
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	handler := slog.NewTextHandler(f, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})
 
-	// сразу инициализирую, чтобы работать через Log
-	slog.SetDefault(slog.New(handler))
-	return nil
+	logger := slog.New(handler)
+	slog.SetDefault(logger)
+
+	return logger, nil
 }
