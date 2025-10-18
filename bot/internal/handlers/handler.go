@@ -70,7 +70,9 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 		if update.Message.IsCommand() {
 			if update.Message.Command() == "start" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Бот запущен!")
+				msg2 := tgbotapi.NewMessage(update.Message.Chat.ID, "Для вызова справки используйте команду /help")
 				h.bot.Send(msg)
+				h.bot.Send(msg2)
 				return
 			}
 			if update.Message.Command() == "help" {
