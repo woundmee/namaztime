@@ -59,17 +59,32 @@ func (ns *NamazService) CommandToday(today namaznsk.Namaz) string {
 	return header + res
 }
 
-func (ns *NamazService) StartNamazNotifier(botID int64) {
+// func (ns *NamazService) StartNamazNotifier(botID int64, message *tgbotapi.Message) {
+func (ns *NamazService) StartNamazNotifier(message *tgbotapi.Message) {
+	chatID := message.Chat.ID
+	userName := message.Chat.UserName
+
+	ns.logger.Info("запускаю нотификатор времени намазов для пользователя", "username", "@"+userName, "chatID", chatID)
 	for {
 		namazTime, name, isExistData := ns.NamazNotify()
 		if isExistData {
-			msgText := fmt.Sprintf("%s - %s - время намаза", name, namazTime)
-			msg := tgbotapi.NewMessage(botID, msgText)
-			ns.bot.Send(msg)
-			ns.logger.Info("Уведомление о наступлении времени намаза отправлено!", "botID", botID, "message", msgText, "msg", msg)
+			msgText := fmt.Sprintf("🌙 %s - %s - время намаза", name, namazTime)
+
+			msg := tgbotapi.NewMessage(chatID, msgText)
+			_, err := ns.bot.Send(msg)
+			if err != nil {
+				if err.Error() == "Forbidden: bot was blocked by the user" {
+					ns.logger.Warn("пользователь заблокировал бота, останавливаю нотификатора времени намазов", "chatID", chatID)
+					return
+				}
+				ns.logger.Error("ошибка отправки уведомления", "chatID", chatID, "error", err)
+			} else {
+				ns.logger.Info("Уведомление о наступлении времени намаза отправлено!", "chatID", chatID, "message", msgText, "msg", msg)
+			}
 		}
 
-		time.Sleep(time.Second * 25)
+		// ns.logger.Warn("Еще не время намаза!")
+		time.Sleep(time.Second * 50)
 	}
 }
 

@@ -1,0 +1,101 @@
+time=2025-10-19T12:35:26.034+07:00 level=INFO msg="ожидание следующей полуночи" длительность=11h24m33.965683139s
+time=2025-10-19T12:35:26.483+07:00 level=INFO msg="Бот запущен" name=@namaznskbot
+time=2025-10-19T12:35:58.450+07:00 level=INFO msg="ожидание следующей полуночи" длительность=11h24m1.549518687s
+time=2025-10-19T12:35:58.947+07:00 level=INFO msg="Бот запущен" name=@namaznskbot
+time=2025-10-19T12:36:11.145+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:36:11.145+07:00 level=WARN msg="кэш пустой"
+time=2025-10-19T12:36:11.145+07:00 level=INFO msg="получаю данные" url=https://namaznsk.ru/namaztime/today
+time=2025-10-19T12:36:11.684+07:00 level=INFO msg="данные получены!" "status code"=200
+time=2025-10-19T12:36:11.684+07:00 level=INFO msg="читаю полученный ответ от сервера" ContentLength=105
+time=2025-10-19T12:36:11.684+07:00 level=INFO msg="данные сохранены в кэше" длина=105
+time=2025-10-19T12:36:15.035+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:36:15.035+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:36:19.225+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/notify group=@wdqm8 groupName=""
+time=2025-10-19T12:36:19.366+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=294928058
+time=2025-10-19T12:36:19.366+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:36:57.108+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:36:57.108+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:37:00.596+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:37:00.596+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:37:09.367+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:37:18.294+07:00 level=INFO msg="ожидание следующей полуночи" длительность=11h22m41.705238789s
+time=2025-10-19T12:37:18.714+07:00 level=INFO msg="Бот запущен" name=@namaznskbot
+time=2025-10-19T12:37:20.794+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:37:20.794+07:00 level=WARN msg="кэш пустой"
+time=2025-10-19T12:37:20.794+07:00 level=INFO msg="получаю данные" url=https://namaznsk.ru/namaztime/today
+time=2025-10-19T12:37:21.177+07:00 level=INFO msg="данные получены!" "status code"=200
+time=2025-10-19T12:37:21.177+07:00 level=INFO msg="читаю полученный ответ от сервера" ContentLength=105
+time=2025-10-19T12:37:21.177+07:00 level=INFO msg="данные сохранены в кэше" длина=105
+time=2025-10-19T12:37:27.674+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/notify group=@wdqm8 groupName=""
+time=2025-10-19T12:37:27.815+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=294928058
+time=2025-10-19T12:37:27.815+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:37:31.939+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/help group=@wdqm8 groupName=""
+time=2025-10-19T12:37:34.898+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:37:34.898+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:37:37.174+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/help group=@wdqm8 groupName=""
+time=2025-10-19T12:38:17.855+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:38:17.986+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=294928058 message="🌙 Зухр - 12:38 - время намаза" msg="{BaseChat:{ChatID:294928058 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:38 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:38:51.477+07:00 level=INFO msg="ожидание следующей полуночи" длительность=11h21m8.522563984s
+time=2025-10-19T12:38:51.945+07:00 level=INFO msg="Бот запущен" name=@namaznskbot
+time=2025-10-19T12:39:03.180+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/start group=@developer789 groupName=""
+time=2025-10-19T12:39:10.851+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/notify group=@developer789 groupName=""
+time=2025-10-19T12:39:10.995+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=2073278383
+time=2025-10-19T12:39:10.995+07:00 level=WARN msg="кэш пустой"
+time=2025-10-19T12:39:10.995+07:00 level=INFO msg="получаю данные" url=https://namaznsk.ru/namaztime/today
+time=2025-10-19T12:39:11.376+07:00 level=INFO msg="данные получены!" "status code"=200
+time=2025-10-19T12:39:11.376+07:00 level=INFO msg="читаю полученный ответ от сервера" ContentLength=105
+time=2025-10-19T12:39:11.376+07:00 level=INFO msg="данные сохранены в кэше" длина=105
+time=2025-10-19T12:39:14.008+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/help group=@developer789 groupName=""
+time=2025-10-19T12:39:15.540+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/today group=@developer789 groupName=""
+time=2025-10-19T12:39:15.540+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:39:17.466+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/today group=@developer789 groupName=""
+time=2025-10-19T12:39:17.466+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:39:18.831+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/help group=@developer789 groupName=""
+time=2025-10-19T12:39:33.021+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/notify group=@wdqm8 groupName=""
+time=2025-10-19T12:39:33.209+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=294928058
+time=2025-10-19T12:39:33.209+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:39:37.545+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/help group=@wdqm8 groupName=""
+time=2025-10-19T12:39:39.982+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/today group=@wdqm8 groupName=""
+time=2025-10-19T12:39:39.982+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:39:41.745+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/help group=@wdqm8 groupName=""
+time=2025-10-19T12:40:01.395+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:40:01.520+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=2073278383 message="🌙 Зухр - 12:40 - время намаза" msg="{BaseChat:{ChatID:2073278383 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:40 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:40:23.212+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:40:23.337+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=294928058 message="🌙 Зухр - 12:40 - время намаза" msg="{BaseChat:{ChatID:294928058 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:40 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:40:51.530+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:40:51.657+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=2073278383 message="🌙 Зухр - 12:40 - время намаза" msg="{BaseChat:{ChatID:2073278383 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:40 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:41:13.338+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:41:41.676+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:42:03.359+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:42:31.696+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:43:07.193+07:00 level=INFO msg="ожидание следующей полуночи" длительность=11h16m52.806976374s
+time=2025-10-19T12:43:07.698+07:00 level=INFO msg="Бот запущен" name=@namaznskbot
+time=2025-10-19T12:43:20.848+07:00 level=INFO msg="Вызывана команда" user=@ command=/start group=@ groupName=""
+time=2025-10-19T12:43:25.884+07:00 level=INFO msg="Вызывана команда" user=@ command=/help group=@ groupName=""
+time=2025-10-19T12:43:32.787+07:00 level=INFO msg="Вызывана команда" user=@developer789 command=/notify group=@developer789 groupName=""
+time=2025-10-19T12:43:32.932+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=2073278383
+time=2025-10-19T12:43:32.932+07:00 level=WARN msg="кэш пустой"
+time=2025-10-19T12:43:32.932+07:00 level=INFO msg="получаю данные" url=https://namaznsk.ru/namaztime/today
+time=2025-10-19T12:43:33.312+07:00 level=INFO msg="данные получены!" "status code"=200
+time=2025-10-19T12:43:33.312+07:00 level=INFO msg="читаю полученный ответ от сервера" ContentLength=105
+time=2025-10-19T12:43:33.312+07:00 level=INFO msg="данные сохранены в кэше" длина=105
+time=2025-10-19T12:43:47.024+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/notify group=@wdqm8 groupName=""
+time=2025-10-19T12:43:47.170+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=294928058
+time=2025-10-19T12:43:47.170+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:43:49.629+07:00 level=INFO msg="Вызывана команда" user=@wdqm8 command=/help group=@wdqm8 groupName=""
+time=2025-10-19T12:44:23.322+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:44:24.282+07:00 level=INFO msg="Вызывана команда" user=@ command=/notify group=@ groupName=""
+time=2025-10-19T12:44:24.427+07:00 level=INFO msg="запускаю нотификатор времени намазов для пользователя" chatID=5192762219
+time=2025-10-19T12:44:24.427+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:44:37.182+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:45:13.322+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:45:13.468+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=2073278383 message="🌙 Зухр - 12:45 - время намаза" msg="{BaseChat:{ChatID:2073278383 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:45 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:45:14.428+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:45:14.551+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=5192762219 message="🌙 Зухр - 12:45 - время намаза" msg="{BaseChat:{ChatID:5192762219 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:45 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:45:27.194+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:45:27.339+07:00 level=INFO msg="Уведомление о наступлении времени намаза отправлено!" chatID=294928058 message="🌙 Зухр - 12:45 - время намаза" msg="{BaseChat:{ChatID:294928058 ChannelUsername: ReplyToMessageID:0 ReplyMarkup:<nil> DisableNotification:false AllowSendingWithoutReply:false} Text:🌙 Зухр - 12:45 - время намаза ParseMode: Entities:[] DisableWebPagePreview:false}"
+time=2025-10-19T12:46:03.483+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:46:04.552+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:46:17.351+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:46:53.519+07:00 level=INFO msg="данные найдены в кеше" длина=105
+time=2025-10-19T12:46:54.552+07:00 level=INFO msg="данные найдены в кеше" длина=105

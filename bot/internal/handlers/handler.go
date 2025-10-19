@@ -85,6 +85,16 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 				h.bot.Send(msg)
 				return
 			}
+			if update.Message.Command() == "notify" {
+				text := "🔔 Вы подписались на уведомления о времени намаза!"
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+				h.bot.Send(msg)
+
+				// запускаю нотификатор для пользователя
+				go h.service.StartNamazNotifier(update.Message)
+				return
+				// todo: сделать без команды /notify, а сразу по умолчанию после старта бота!
+			}
 		}
 
 		// echo sms

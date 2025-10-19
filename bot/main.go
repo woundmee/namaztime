@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"os"
-	"strconv"
 	"sync"
 
 	"telegramBot/clients/namaznsk"
@@ -60,12 +59,12 @@ func main() {
 
 	service := services.New(logger, bot)
 	service.SetNamazClient(clientNamaznsk)
-	botID, err := strconv.Atoi(os.Getenv("TG_BOT_ID"))
-	if err != nil {
-		logger.Error("Не удалось получить/сконвертировать переменную окружения TG_BOT_ID", "error", err)
-	}
+	// botID, err := strconv.Atoi(os.Getenv("TG_BOT_ID"))
+	// if err != nil {
+	// 	logger.Error("Не удалось получить/сконвертировать переменную окружения TG_BOT_ID", "error", err)
+	// }
 
-	go service.StartNamazNotifier(int64(botID))
+	// go service.StartNamazNotifier()
 
 	// bot init & start
 	botHandler := handlers.New(logger, *bot, *clientNamaznsk, *service)
