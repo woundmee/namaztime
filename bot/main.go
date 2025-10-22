@@ -3,12 +3,11 @@ package main
 import (
 	"log"
 	"os"
-	"sync"
-
 	"telegramBot/clients/namaznsk"
 	"telegramBot/internal/cache"
 	"telegramBot/internal/handlers"
 	"telegramBot/internal/services"
+	storage "telegramBot/internal/storage/sqlite"
 	"telegramBot/slogger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -16,14 +15,6 @@ import (
 )
 
 func main() {
-
-	// TODO START
-	// + 1. Написать функцию, которая в 00:00 ежедневно обновляет кеш
-	// 2. Написать функцию, которая по времени отправляет уведомление. Пример: наступил Зухр - оповещает.
-	// 3. Обновить readme.md: добавить информацию как поднять API и Bot (подробно).
-	// TODO END
-
-	var wg sync.WaitGroup
 
 	err := godotenv.Load()
 	if err != nil {
@@ -37,6 +28,10 @@ func main() {
 		panic("не удалось инициализировать логгер")
 	}
 
+	// storage init
+	storage := storage.New(logger)
+	storage.Create()
+
 	urlTodaySchedule := os.Getenv("URL_TODAY_SCHEDULE")
 
 	// cache init
@@ -44,8 +39,6 @@ func main() {
 
 	// client init
 	clientNamaznsk := namaznsk.New(logger, cache, urlTodaySchedule)
-
-	wg.Add(1)
 	go clientNamaznsk.StartDailyUpdateCache()
 
 	// bot
@@ -57,19 +50,12 @@ func main() {
 
 	// bot.Debug = true
 
-	service := services.New(logger, bot)
-	service.SetNamazClient(clientNamaznsk)
-	// botID, err := strconv.Atoi(os.Getenv("TG_BOT_ID"))
-	// if err != nil {
-	// 	logger.Error("Не удалось получить/сконвертировать переменную окружения TG_BOT_ID", "error", err)
-	// }
-
-	// go service.StartNamazNotifier()
+	// services init
+	service := services.New(logger, clientNamaznsk, bot, storage)
+	// service.SetNamazClient(clientNamaznsk)
 
 	// bot init & start
 	botHandler := handlers.New(logger, *bot, *clientNamaznsk, *service)
 	botHandler.Start()
-
-	wg.Wait()
 
 }

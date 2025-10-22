@@ -3,8 +3,10 @@ package handlers
 import (
 	"fmt"
 	"log/slog"
+	"os"
 	"telegramBot/clients/namaznsk"
 	"telegramBot/internal/services"
+	storage "telegramBot/internal/storage/sqlite"
 
 	// "telegramBot/services"
 
@@ -15,10 +17,11 @@ type Handler struct {
 	logger  *slog.Logger
 	bot     tgbotapi.BotAPI
 	namaz   namaznsk.Namaz
-	service services.NamazService
+	service services.Service
+	storage storage.Database
 }
 
-func New(logger *slog.Logger, botKey tgbotapi.BotAPI, namaz namaznsk.Namaz, service services.NamazService) *Handler {
+func New(logger *slog.Logger, botKey tgbotapi.BotAPI, namaz namaznsk.Namaz, service services.Service) *Handler {
 	return &Handler{
 		logger:  logger,
 		bot:     botKey,
@@ -31,6 +34,8 @@ func (h *Handler) Start() {
 	fmt.Printf("Бот @%s запущен!\n", h.bot.Self.UserName)
 	h.logger.Info("Бот запущен", "name", "@"+h.bot.Self.UserName)
 
+	go h.service.StartNamazNotifier()
+
 	discardData := h.DiscardOfflineUpdates()
 	u := tgbotapi.NewUpdate(discardData + 1)
 	u.Timeout = 60
@@ -39,6 +44,7 @@ func (h *Handler) Start() {
 	for update := range updates {
 		h.handlerUpdate(update)
 	}
+
 }
 
 // отбрасывает смс, которые были получены в оффлайне
@@ -69,10 +75,18 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 
 		if update.Message.IsCommand() {
 			if update.Message.Command() == "start" {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Бот запущен!")
-				msg2 := tgbotapi.NewMessage(update.Message.Chat.ID, "Для вызова справки используйте команду /help")
+				text := "🚀 Бот запущен!\n\n" +
+					"🔔 Теперь вы будете получать уведомления о наступлении времени намазов."
+				text2 := "Для получения справочной информации, используйте команду /help"
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+				msg2 := tgbotapi.NewMessage(update.Message.Chat.ID, text2)
 				h.bot.Send(msg)
 				h.bot.Send(msg2)
+
+				// сохраняю пользователя в БД
+				h.storage.Insert(update.Message.Chat.ID, update.Message.Chat.UserName)
+				// h.service.AddUser(update.Message.Chat.ID, update.Message.Chat.UserName)
+
 				return
 			}
 			if update.Message.Command() == "help" {
@@ -85,18 +99,21 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 				h.bot.Send(msg)
 				return
 			}
-			if update.Message.Command() == "notify" {
-				text := "🔔 Вы подписались на уведомления о времени намаза!"
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
-				h.bot.Send(msg)
-
-				// запускаю нотификатор для пользователя
-				go h.service.StartNamazNotifier(update.Message)
+			if update.Message.Command() == "stop" {
+				// h.service.DeleteUser(update.Message.Chat.ID)
+				h.storage.Delete(update.Message.Chat.ID)
 				return
-				// todo: сделать без команды /notify, а сразу по умолчанию после старта бота!
+			}
+			if update.Message.Command() == "all" {
+				admin := os.Getenv("ADMIN")
+				if update.Message.Chat.UserName == admin {
+					h.service.SendAll(update.Message.CommandArguments())
+					return
+				}
 			}
 		}
 
 		// echo sms
 	}
+
 }

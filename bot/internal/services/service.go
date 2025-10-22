@@ -3,93 +3,108 @@ package services
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 	"telegramBot/clients/namaznsk"
+	storage "telegramBot/internal/storage/sqlite"
 	"time"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type NamazService struct {
+type Service struct {
 	logger   *slog.Logger
 	namaznsk *namaznsk.Namaz
 	bot      *tgbotapi.BotAPI
+	storage  *storage.Database
 }
 
-func New(logger *slog.Logger, bot *tgbotapi.BotAPI) *NamazService {
-	return &NamazService{
-		logger: logger,
-		bot:    bot,
+func New(logger *slog.Logger, namaznsk *namaznsk.Namaz, bot *tgbotapi.BotAPI, storage *storage.Database) *Service {
+	return &Service{
+		logger:   logger,
+		namaznsk: namaznsk,
+		bot:      bot,
+		storage:  storage,
 	}
 }
 
-// Добавьте метод для установки namaznsk клиента
-func (ns *NamazService) SetNamazClient(namazClient *namaznsk.Namaz) {
-	ns.namaznsk = namazClient
-}
+// // fixme: метод для установки namaznsk клиента. Нужна ли?!
+// func (ns *NamazService) SetNamazClient(namazClient *namaznsk.Namaz) {
+// 	ns.namaznsk = namazClient
+// }
 
-func (ns *NamazService) CommandHelp() string {
-	msg := `Ассаляму аляйкум!
-Я бот для получения расписания намазов по г. Норильск.
-	
-	Что я умею?
-	/help — получить справку
-	/today — расписание намазов за сегодня
-	
-	добавить откуда беру расписание и что всё доступно на сайте. Также и распечатать можно на сайте`
+// func (ns *NamazService) AddUser(chatID int64, username string) {
+// 	ns.storage.Insert(chatID, username)
+// }
 
-	return msg
-}
+// func (ns *NamazService) DeleteUser(chatID int64) {
+// 	ns.storage.Delete(chatID)
+// }
 
-func (ns *NamazService) CommandToday(today namaznsk.Namaz) string {
+func (ns *Service) SendAll(message string) {
 
-	// data, err := today.TodaySchedule(url)
-	data, err := today.TodaySchedule()
+	users, err := ns.storage.Get()
 	if err != nil {
-		msg := "ошибка получения расписания"
-		ns.logger.Error(msg, "error", err)
-		return err.Error()
+		ns.logger.Error("не удалось получить список пользователей", "error", err)
+		return
 	}
 
-	header := "🌙 День " + data.Day + "\n" +
-		"🕌 Норильск\n\n"
-	// res := fmt.Sprintf("%s\t- Фаджр\n%s\t- Восход\n%s\t- Зухр", data.Fajr, data.Sunrise, data.Zuhr)
-	res := fmt.Sprintf("%s   - Фаджр\n%s   - Восход\n%s - Зухр\n%s - Аср\n%s - Магриб\n%s - Иша",
-		data.Fajr, data.Sunrise, data.Zuhr, data.Asr, data.Magrib, data.Isha)
-
-	return header + res
+	for chatID, username := range users {
+		msg := tgbotapi.NewMessage(chatID, message)
+		ns.bot.Send(msg)
+		ns.logger.Info("пользователею отправлено сообщение", "username", username, "chatID", chatID, "message", message)
+	}
 }
 
-// func (ns *NamazService) StartNamazNotifier(botID int64, message *tgbotapi.Message) {
-func (ns *NamazService) StartNamazNotifier(message *tgbotapi.Message) {
-	chatID := message.Chat.ID
-	userName := message.Chat.UserName
+func (ns *Service) StartNamazNotifier() {
+	ns.logger.Info("запускаю нотификатор времени намазов")
 
-	ns.logger.Info("запускаю нотификатор времени намазов для пользователя", "username", "@"+userName, "chatID", chatID)
+	var lastSendNotify string
+
 	for {
-		namazTime, name, isExistData := ns.NamazNotify()
-		if isExistData {
-			msgText := fmt.Sprintf("🌙 %s - %s - время намаза", name, namazTime)
+		currTime, name, isExistData := ns.IsNamazTime()
+		if !isExistData {
+			lastSendNotify = ""
+			time.Sleep(time.Minute)
+			continue
+		}
 
-			msg := tgbotapi.NewMessage(chatID, msgText)
+		// если отправил уведомление - пропускаю
+		if lastSendNotify == currTime {
+			time.Sleep(time.Minute)
+			continue
+		}
+
+		users, err := ns.storage.Get()
+		if err != nil {
+			ns.logger.Error("не удалось получить список пользователей", "error", err)
+			time.Sleep(time.Minute)
+			continue
+		}
+
+		msgText := fmt.Sprintf("%s — время намаза", strings.ToLower(name))
+		for userChatID, userName := range users {
+			msg := tgbotapi.NewMessage(userChatID, msgText)
 			_, err := ns.bot.Send(msg)
 			if err != nil {
-				if err.Error() == "Forbidden: bot was blocked by the user" {
-					ns.logger.Warn("пользователь заблокировал бота, останавливаю нотификатора времени намазов", "chatID", chatID)
+				if strings.Contains(err.Error(), "Forbidden: bot was blocked by the user") {
+					ns.logger.Info("пользователь заблокировал бота", "username", userName, "chatID", userChatID, "error", err)
+					ns.storage.Delete(userChatID)
+					ns.logger.Info("пользователь удален из БД", "username", userName, "chatID", userChatID)
 					return
 				}
-				ns.logger.Error("ошибка отправки уведомления", "chatID", chatID, "error", err)
+				ns.logger.Error("ошибка отправки уведомления", "chatID", userChatID, "username", userName, "error", err)
 			} else {
-				ns.logger.Info("Уведомление о наступлении времени намаза отправлено!", "chatID", chatID, "message", msgText, "msg", msg)
+				ns.logger.Info("Уведомление о наступлении времени намаза отправлено!", "chatID", userChatID, "username", userName)
 			}
 		}
 
-		// ns.logger.Warn("Еще не время намаза!")
-		time.Sleep(time.Second * 50)
+		lastSendNotify = currTime
+		time.Sleep(time.Minute * 20)
 	}
 }
 
-func (ns *NamazService) NamazNotify() (string, string, bool) {
-	const fn = "services.service.NamazNotify"
+func (ns *Service) IsNamazTime() (string, string, bool) {
+	const fn = "services.service.IsNamazTime"
 
 	now := time.Now().Format("15:04")
 	todayData, err := ns.namaznsk.TodaySchedule()
@@ -113,4 +128,43 @@ func (ns *NamazService) NamazNotify() (string, string, bool) {
 
 	return "", "", false
 
+}
+
+func (ns *Service) CommandNotify(chatID int64, username string) string {
+	text := "🔔 Вы подписались на уведомления о времени намаза!"
+	ns.storage.Insert(chatID, username)
+	ns.logger.Info("в БД добавлен новый пользователь", "chatID", chatID, "username", username)
+	return text
+}
+
+func (ns *Service) CommandHelp() string {
+	msg := `Ассаляму аляйкум!
+Я бот для получения расписания намазов по г. Норильск.
+	
+	Что я умею?
+	/help — получить справку
+	/today — расписание намазов за сегодня
+	
+	добавить откуда беру расписание и что всё доступно на сайте. Также и распечатать можно на сайте`
+
+	return msg
+}
+
+func (ns *Service) CommandToday(today namaznsk.Namaz) string {
+
+	// data, err := today.TodaySchedule(url)
+	data, err := today.TodaySchedule()
+	if err != nil {
+		msg := "ошибка получения расписания"
+		ns.logger.Error(msg, "error", err)
+		return err.Error()
+	}
+
+	header := "🌙 День " + data.Day + "\n" +
+		"🕌 Норильск\n\n"
+	// res := fmt.Sprintf("%s\t- Фаджр\n%s\t- Восход\n%s\t- Зухр", data.Fajr, data.Sunrise, data.Zuhr)
+	res := fmt.Sprintf("%s   - Фаджр\n%s   - Восход\n%s - Зухр\n%s - Аср\n%s - Магриб\n%s - Иша",
+		data.Fajr, data.Sunrise, data.Zuhr, data.Asr, data.Magrib, data.Isha)
+
+	return header + res
 }
