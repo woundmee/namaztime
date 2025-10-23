@@ -28,14 +28,10 @@ func main() {
 		panic("не удалось инициализировать логгер")
 	}
 
-	// storage init
-	storage := storage.New(logger)
-	storage.Create()
-
-	urlTodaySchedule := os.Getenv("URL_TODAY_SCHEDULE")
-
 	// cache init
 	cache := cache.New(logger)
+
+	urlTodaySchedule := os.Getenv("URL_TODAY_SCHEDULE")
 
 	// client init
 	clientNamaznsk := namaznsk.New(logger, cache, urlTodaySchedule)
@@ -47,15 +43,19 @@ func main() {
 	if err != nil {
 		log.Panic("Не удалось загрузить переменные окружения")
 	}
-
 	// bot.Debug = true
+
+	// storage init
+	storage := storage.New(logger)
+	storage.Create()
 
 	// services init
 	service := services.New(logger, clientNamaznsk, bot, storage)
 	// service.SetNamazClient(clientNamaznsk)
+	go service.StartNamazNotifier()
 
 	// bot init & start
-	botHandler := handlers.New(logger, *bot, *clientNamaznsk, *service)
+	botHandler := handlers.New(logger, *bot, *clientNamaznsk, *service, storage)
 	botHandler.Start()
 
 }

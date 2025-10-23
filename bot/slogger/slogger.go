@@ -11,6 +11,8 @@ func Init(logFilePath string) (*slog.Logger, error) {
 		return nil, err
 	}
 
+	// defer f.Close()
+
 	handler := slog.NewTextHandler(f, &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	})

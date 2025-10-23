@@ -18,15 +18,16 @@ type Handler struct {
 	bot     tgbotapi.BotAPI
 	namaz   namaznsk.Namaz
 	service services.Service
-	storage storage.Database
+	storage *storage.Database
 }
 
-func New(logger *slog.Logger, botKey tgbotapi.BotAPI, namaz namaznsk.Namaz, service services.Service) *Handler {
+func New(logger *slog.Logger, botKey tgbotapi.BotAPI, namaz namaznsk.Namaz, service services.Service, storage *storage.Database) *Handler {
 	return &Handler{
 		logger:  logger,
 		bot:     botKey,
 		namaz:   namaz,
 		service: service,
+		storage: storage,
 	}
 }
 
@@ -34,7 +35,7 @@ func (h *Handler) Start() {
 	fmt.Printf("Бот @%s запущен!\n", h.bot.Self.UserName)
 	h.logger.Info("Бот запущен", "name", "@"+h.bot.Self.UserName)
 
-	go h.service.StartNamazNotifier()
+	// go h.service.StartNamazNotifier()
 
 	discardData := h.DiscardOfflineUpdates()
 	u := tgbotapi.NewUpdate(discardData + 1)
@@ -71,7 +72,7 @@ func (h *Handler) DiscardOfflineUpdates() int {
 
 func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 	if update.Message != nil {
-		h.logger.Info("Вызывана команда", "user", "@"+update.Message.From.UserName, "command", update.Message.Text, "group", "@"+update.Message.Chat.UserName, "groupName", update.Message.Chat.Title)
+		h.logger.Info("вызвана команда", "user", "@"+update.Message.From.UserName, "command", update.Message.Text, "group", "@"+update.Message.Chat.UserName, "groupName", update.Message.Chat.Title)
 
 		if update.Message.IsCommand() {
 			if update.Message.Command() == "start" {
@@ -84,7 +85,7 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 				h.bot.Send(msg2)
 
 				// сохраняю пользователя в БД
-				h.storage.Insert(update.Message.Chat.ID, update.Message.Chat.UserName)
+				h.storage.AddUser(update.Message.Chat.ID, update.Message.Chat.UserName)
 				// h.service.AddUser(update.Message.Chat.ID, update.Message.Chat.UserName)
 
 				return
@@ -101,7 +102,7 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 			}
 			if update.Message.Command() == "stop" {
 				// h.service.DeleteUser(update.Message.Chat.ID)
-				h.storage.Delete(update.Message.Chat.ID)
+				h.storage.DeleteUser(update.Message.Chat.ID)
 				return
 			}
 			if update.Message.Command() == "all" {

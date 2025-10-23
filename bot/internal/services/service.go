@@ -42,7 +42,7 @@ func New(logger *slog.Logger, namaznsk *namaznsk.Namaz, bot *tgbotapi.BotAPI, st
 
 func (ns *Service) SendAll(message string) {
 
-	users, err := ns.storage.Get()
+	users, err := ns.storage.GetUsers()
 	if err != nil {
 		ns.logger.Error("не удалось получить список пользователей", "error", err)
 		return
@@ -58,48 +58,45 @@ func (ns *Service) SendAll(message string) {
 func (ns *Service) StartNamazNotifier() {
 	ns.logger.Info("запускаю нотификатор времени намазов")
 
-	var lastSendNotify string
-
 	for {
-		currTime, name, isExistData := ns.IsNamazTime()
-		if !isExistData {
-			lastSendNotify = ""
-			time.Sleep(time.Minute)
-			continue
-		}
+		_, name, isExistData := ns.IsNamazTime()
 
-		// если отправил уведомление - пропускаю
-		if lastSendNotify == currTime {
-			time.Sleep(time.Minute)
-			continue
-		}
-
-		users, err := ns.storage.Get()
-		if err != nil {
-			ns.logger.Error("не удалось получить список пользователей", "error", err)
-			time.Sleep(time.Minute)
-			continue
-		}
-
-		msgText := fmt.Sprintf("%s — время намаза", strings.ToLower(name))
-		for userChatID, userName := range users {
-			msg := tgbotapi.NewMessage(userChatID, msgText)
-			_, err := ns.bot.Send(msg)
+		if isExistData {
+			users, err := ns.storage.GetUsers()
 			if err != nil {
-				if strings.Contains(err.Error(), "Forbidden: bot was blocked by the user") {
-					ns.logger.Info("пользователь заблокировал бота", "username", userName, "chatID", userChatID, "error", err)
-					ns.storage.Delete(userChatID)
-					ns.logger.Info("пользователь удален из БД", "username", userName, "chatID", userChatID)
-					return
-				}
-				ns.logger.Error("ошибка отправки уведомления", "chatID", userChatID, "username", userName, "error", err)
-			} else {
-				ns.logger.Info("Уведомление о наступлении времени намаза отправлено!", "chatID", userChatID, "username", userName)
+				ns.logger.Error("не удалось получить список пользователей", "error", err)
+				return
 			}
+
+			msgText := fmt.Sprintf("%s — время намаза", strings.ToLower(name))
+
+			if name == "Восход" {
+				msgText = "время восхода"
+			}
+
+			for userChatID, userName := range users {
+				msg := tgbotapi.NewMessage(userChatID, msgText)
+				_, err := ns.bot.Send(msg)
+				if err != nil {
+					if strings.Contains(err.Error(), "Forbidden: bot was blocked by the user") {
+						ns.logger.Info("пользователь заблокировал бота", "username", userName, "chatID", userChatID, "error", err)
+						ns.storage.DeleteUser(userChatID)
+						ns.logger.Info("пользователь удален из БД", "username", userName, "chatID", userChatID)
+						continue
+					}
+					ns.logger.Error("ошибка отправки уведомления", "chatID", userChatID, "username", userName, "error", err)
+				} else {
+					ns.logger.Info("уведомление о наступлении времени намаза отправлено!", "namaz", name, "chatID", userChatID, "username", userName)
+				}
+			}
+
+			// пауза после отправки времени намаза
+			time.Sleep(time.Second * 60)
+			// time.Sleep(time.Minute * 20)
+
 		}
 
-		lastSendNotify = currTime
-		time.Sleep(time.Minute * 20)
+		time.Sleep(time.Second * 50)
 	}
 }
 
@@ -127,12 +124,11 @@ func (ns *Service) IsNamazTime() (string, string, bool) {
 	}
 
 	return "", "", false
-
 }
 
 func (ns *Service) CommandNotify(chatID int64, username string) string {
 	text := "🔔 Вы подписались на уведомления о времени намаза!"
-	ns.storage.Insert(chatID, username)
+	ns.storage.AddUser(chatID, username)
 	ns.logger.Info("в БД добавлен новый пользователь", "chatID", chatID, "username", username)
 	return text
 }

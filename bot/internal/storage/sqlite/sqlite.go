@@ -56,7 +56,7 @@ func (d *Database) Create() error {
 	return nil
 }
 
-func (d *Database) Insert(chatID int64, username string) error {
+func (d *Database) AddUser(chatID int64, username string) error {
 	db, err := d.connect()
 	if err != nil {
 		d.logger.Error("ошибка подключения к БД", "error", err)
@@ -66,6 +66,19 @@ func (d *Database) Insert(chatID int64, username string) error {
 	defer db.Close()
 
 	// fixme: добавить проверку на наличие пользователя в БД: возникает ошибка в логах
+	users, err := d.GetUsers()
+	if err != nil {
+		d.logger.Error("не удалось получить список пользователей из БД", "error", err)
+		return err
+	}
+
+	// проверка на наличие пользователя в БД
+	for userChatID := range users {
+		if chatID == userChatID {
+			d.logger.Info("пользователь повторно вызвал команду /start", "chatID", chatID)
+			return nil
+		}
+	}
 
 	queryInsert := "insert into users (chatID, username) values (?, ?)"
 	_, err = db.Exec(queryInsert, chatID, username)
@@ -77,7 +90,7 @@ func (d *Database) Insert(chatID int64, username string) error {
 	return nil
 }
 
-func (d *Database) Delete(chatID int64) error {
+func (d *Database) DeleteUser(chatID int64) error {
 	db, err := d.connect()
 	if err != nil {
 		d.logger.Error("ошибка подключения к БД", "error", err)
@@ -108,7 +121,7 @@ func (d *Database) Delete(chatID int64) error {
 	return nil
 }
 
-func (d *Database) Get() (map[int64]string, error) {
+func (d *Database) GetUsers() (map[int64]string, error) {
 	db, err := d.connect()
 	if err != nil {
 		d.logger.Error("ошибка подключения к БД", "error", err)

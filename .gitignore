@@ -2,9 +2,12 @@
 # ===== gitignore ===== #
 # ===================== #
 
-# переменные окружения
+# api
 api/.env
-bot/.env
-
-# каталог с файлами .csv
 api/schedules/
+api/api.log
+
+# bot
+bot/.env
+bot/users.db
+bot/bot.log
