@@ -65,7 +65,7 @@ func (d *Database) AddUser(chatID int64, username string) error {
 
 	defer db.Close()
 
-	// fixme: добавить проверку на наличие пользователя в БД: возникает ошибка в логах
+	// // fixme: добавить проверку на наличие пользователя в БД: возникает ошибка в логах
 	users, err := d.GetUsers()
 	if err != nil {
 		d.logger.Error("не удалось получить список пользователей из БД", "error", err)
@@ -86,6 +86,8 @@ func (d *Database) AddUser(chatID int64, username string) error {
 		d.logger.Error("не удалось записать новые данные в БД", "chatID", chatID, "username", username, "erorr", err)
 		return err
 	}
+
+	d.logger.Info("в БД добавлен новый пользователь", "chatID", chatID, "username", username)
 
 	return nil
 }
@@ -115,7 +117,7 @@ func (d *Database) DeleteUser(chatID int64) error {
 	if rowsAffected == 0 {
 		d.logger.Warn("запись для удаления не найдена", "chatID", chatID)
 	} else {
-		d.logger.Info("запись успешно удалена", "chatID", chatID)
+		d.logger.Info("Пользователь удален из БД", "chatID", chatID)
 	}
 
 	return nil
@@ -154,9 +156,9 @@ func (d *Database) GetUsers() (map[int64]string, error) {
 		users[chatID] = username
 	}
 
-	if len(users) == 0 {
-		return nil, fmt.Errorf("список пользователей пуст: %s", err)
-	}
+	// if len(users) == 0 {
+	// 	return nil, fmt.Errorf("список пользователей пуст: %s", err)
+	// }
 
 	return users, nil
 }

@@ -71,23 +71,25 @@ func (h *Handler) DiscardOfflineUpdates() int {
 }
 
 func (h *Handler) handlerUpdate(update tgbotapi.Update) {
+	admin := os.Getenv("ADMIN")
+
 	if update.Message != nil {
 		h.logger.Info("вызвана команда", "user", "@"+update.Message.From.UserName, "command", update.Message.Text, "group", "@"+update.Message.Chat.UserName, "groupName", update.Message.Chat.Title)
 
 		if update.Message.IsCommand() {
 			if update.Message.Command() == "start" {
-				text := "🚀 Бот запущен!\n\n" +
-					"🔔 Теперь вы будете получать уведомления о наступлении времени намазов."
-				text2 := "Для получения справочной информации, используйте команду /help"
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
-				msg2 := tgbotapi.NewMessage(update.Message.Chat.ID, text2)
+				start := h.service.CommandStart(update.Message.Chat.ID, update.Message.Chat.UserName)
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, start)
 				h.bot.Send(msg)
-				h.bot.Send(msg2)
 
-				// сохраняю пользователя в БД
-				h.storage.AddUser(update.Message.Chat.ID, update.Message.Chat.UserName)
-				// h.service.AddUser(update.Message.Chat.ID, update.Message.Chat.UserName)
+				// проверка на ADMIN
+				if update.Message.Chat.UserName == admin {
+					adminCommands := "⚙ Команды админа:\n\n" +
+						"/all <message> - отправить сообщение всем участникам бота."
 
+					msg := tgbotapi.NewMessage(update.Message.Chat.ID, adminCommands)
+					h.bot.Send(msg)
+				}
 				return
 			}
 			if update.Message.Command() == "help" {
@@ -100,13 +102,11 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 				h.bot.Send(msg)
 				return
 			}
-			if update.Message.Command() == "stop" {
-				// h.service.DeleteUser(update.Message.Chat.ID)
-				h.storage.DeleteUser(update.Message.Chat.ID)
+			if update.Message.Command() == "unsubscribe" {
+				h.service.CommandUnsubscribe(update.Message.Chat.ID)
 				return
 			}
 			if update.Message.Command() == "all" {
-				admin := os.Getenv("ADMIN")
 				if update.Message.Chat.UserName == admin {
 					h.service.SendAll(update.Message.CommandArguments())
 					return

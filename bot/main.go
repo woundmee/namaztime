@@ -31,6 +31,10 @@ func main() {
 	// cache init
 	cache := cache.New(logger)
 
+	// storage init
+	storage := storage.New(logger)
+	storage.Create()
+
 	urlTodaySchedule := os.Getenv("URL_TODAY_SCHEDULE")
 
 	// client init
@@ -44,10 +48,6 @@ func main() {
 		log.Panic("Не удалось загрузить переменные окружения")
 	}
 	// bot.Debug = true
-
-	// storage init
-	storage := storage.New(logger)
-	storage.Create()
 
 	// services init
 	service := services.New(logger, clientNamaznsk, bot, storage)
