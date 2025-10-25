@@ -46,13 +46,11 @@ func (s *Service) StartNamazNotifier() {
 	s.logger.Info("запускаю нотификатор времени намазов")
 
 	for {
-		_, name, isExistData := s.isNamazTime()
+		now := time.Now().Format("15:04")
+		_, name, isExistData := s.isNamazTime(now)
 
 		// пятничные уведомления
 		if int(time.Now().Weekday()) == int(time.Friday) {
-
-			now := time.Now().Format("15:04")
-
 			sunnahText, isBefore2HourZuhr := s.friday(now)
 			duaText, isBefore1HourMagrib := s.beforeMagrib1Hour(now)
 
@@ -127,9 +125,10 @@ func (s *Service) StartNamazNotifier() {
 	}
 }
 
-func (s *Service) isNamazTime() (string, string, bool) {
-	now := time.Now().Format("15:04")
+func (s *Service) isNamazTime(now string) (string, string, bool) {
+	// now := time.Now().Format("15:04")
 	namazTimes, err := s.namazDataMap()
+
 	if err != nil {
 		s.logger.Error("не удалось получить расписание за текущий день", "error", err)
 		return "", "", false
@@ -292,7 +291,7 @@ func (s *Service) CommandToday(today namaznsk.Namaz) string {
 	header := icon + " День " + data.Day + "\n" +
 		"🕌 Норильск\n\n"
 	// res := fmt.Sprintf("%s\t- Фаджр\n%s\t- Восход\n%s\t- Зухр", data.Fajr, data.Sunrise, data.Zuhr)
-	res := fmt.Sprintf("%s   - Фаджр\n%s   - Восход\n%s - Зухр\n%s - Аср\n%s - Магриб\n%s - Иша",
+	res := fmt.Sprintf("%s - Фаджр\n%s - Восход\n%s - Зухр\n%s - Аср\n%s - Магриб\n%s - Иша",
 		data.Fajr, data.Sunrise, data.Zuhr, data.Asr, data.Magrib, data.Isha)
 
 	return header + res

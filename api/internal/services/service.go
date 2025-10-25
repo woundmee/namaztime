@@ -8,6 +8,7 @@ import (
 	"namaztimeApi/models"
 	"os"
 	"strconv"
+	"time"
 )
 
 // здесь будут сервисы (бизнес-логика).
@@ -62,15 +63,25 @@ func (s *Service) NamazDataMonth(path string) ([]models.NamazTime, error) {
 
 		data = append(data, models.NamazTime{
 			Day:     record[0],
-			Fajr:    record[1],
-			Sunrise: record[2],
-			Zuhr:    record[3],
-			Asr:     record[4],
-			Magrib:  record[5],
-			Isha:    record[6],
+			Fajr:    s.timeFormatted(record[1]),
+			Sunrise: s.timeFormatted(record[2]),
+			Zuhr:    s.timeFormatted(record[3]),
+			Asr:     s.timeFormatted(record[4]),
+			Magrib:  s.timeFormatted(record[5]),
+			Isha:    s.timeFormatted(record[6]),
 		})
 	}
 	return data, nil
+}
+
+func (s *Service) timeFormatted(t string) string {
+	timeCustomFormat, err := time.Parse("15:04", t)
+	if err != nil {
+		s.logger.Error("не удалось сконвертировать время", "error", err)
+		return err.Error()
+	}
+
+	return timeCustomFormat.Format("15:04")
 }
 
 // получить расписание намазов за текущий день
