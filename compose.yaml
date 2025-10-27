@@ -1,19 +1,17 @@
 # Docker compose config file
 
-version: '3.8'
-
 services:
 
   # service 1: api
   namaztime-api:
     image: golang:1.25-alpine3.22
     env_file:
-      - .env  # файл с переменными окружения
+      - ./api/.env  # файл с переменными окружения
     working_dir: /api
     volumes:
       - ./api:/api
     command: >
-      /bin/sh -c "apk add --no-cache bash git && go mod download && go build -o namaztime-api . && ./namaztime-api"
+      /bin/sh -c "apk add --no-cache bash git vim cat && go mod download && go build -o namaztime-api . && ./namaztime-api"
     ports:
       - "8080:8080" # проброс порта
     # expose:
@@ -24,11 +22,11 @@ services:
   namaztime-bot:
     image: golang:1.25-alpine3.22
     env_file:
-      - .envя
+      - ./bot/.env
     working_dir: /bot
     volumes:
       - ./bot:/bot
-    command: /bin/sh -c "apk add --no-cache bash git && go mod download && go build -o namaztime-bot . && ./namaztime-bot"
+    command: /bin/sh -c "apk add --no-cache bash git vim && go mod download && go build -o namaztime-bot . && ./namaztime-bot"
     depends_on:
       - namaztime-api # зависимость от namaztime-api
     restart: unless-stopped

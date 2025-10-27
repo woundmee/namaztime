@@ -11,3 +11,6 @@ api/api.log
 bot/.env
 bot/users.db
 bot/bot.log
+
+# app
+tasks.todo

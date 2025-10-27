@@ -94,7 +94,11 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 			}
 			if update.Message.Command() == "help" {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, h.service.CommandHelp())
-				h.bot.Send(msg)
+				msg.ParseMode = "HTML"
+				_, err := h.bot.Send(msg)
+				if err != nil {
+					h.logger.Error("ошибка отправки сообщения", "error", err)
+				}
 				return
 			}
 			if update.Message.Command() == "today" {
@@ -103,7 +107,9 @@ func (h *Handler) handlerUpdate(update tgbotapi.Update) {
 				return
 			}
 			if update.Message.Command() == "unsubscribe" {
-				h.service.CommandUnsubscribe(update.Message.Chat.ID)
+				text := h.service.CommandUnsubscribe(update.Message.Chat.ID)
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+				h.bot.Send(msg)
 				return
 			}
 			if update.Message.Command() == "all" {
