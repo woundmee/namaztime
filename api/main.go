@@ -15,9 +15,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		msg := "Не удалось загрузить переменные окружения"
-		// logger.Error(msg)
-		panic(msg)
+		panic("не удалось загрузить переменные окружения")
 	}
 
 	logFile := os.Getenv("API_LOG_FILE")

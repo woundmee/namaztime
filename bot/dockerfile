@@ -1,0 +1,24 @@
+# dockerfile from api: multi-stage build
+
+# stage 1: build
+from golang:1.25-alpine as builder
+workdir /bot
+copy . .
+
+# env http_proxy=http://user:password@ip:port
+# env https_proxy=http://user:password@ip:port
+
+# run go build -mod=vendor -o namaztime-bot .
+run go mod download && go build -o namaztime-bot .
+
+# stage 2: runtime
+from alpine:3.22
+
+RUN apk add --no-cache tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Krasnoyarsk /etc/localtime && \
+    echo "Asia/Krasnoyarsk" > /etc/timezone
+ENV TZ=Asia/Krasnoyarsk
+    
+workdir /bot
+copy --from=builder /bot/namaztime-bot .
+cmd ["./namaztime-bot"]

@@ -1,0 +1,39 @@
+# Docker compose config file
+
+services:
+
+  # service 1: api
+  namaztime-api:
+    container_name: api
+    env_file:
+      - ./api/.env
+    build:
+      context: ./api
+      dockerfile: dockerfile
+    # environment:
+    #   - http_proxy=http://username:password@ip:port
+    #   - https_proxy=http://username:password@ip:port
+    volumes:
+      - ./api/api.log:/api/api.log
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # service 2: bot
+  namaztime-bot:
+    container_name: bot
+    env_file:
+      - ./bot/.env
+    build:
+      context: ./bot
+      dockerfile: dockerfile
+    working_dir: /bot
+    # environment:
+    #   - http_proxy=http://username:password@ip:port
+    #   - https_proxy=http://username:password@ip:port
+    volumes:
+      - ./bot/bot.log:/bot/bot.log
+      - ./bot/users.db:/bot/users.db
+    depends_on:
+      - namaztime-api # зависимость от namaztime-api
+    restart: unless-stopped

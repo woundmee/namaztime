@@ -78,7 +78,7 @@ func (n *Namaz) todayDataCache() ([]byte, error) {
 	}
 
 	if data, ok := n.cache.Get(); ok {
-		n.logger.Info("данные найдены в кеше", "длина", len(data))
+		// n.logger.Info("данные найдены в кеше", "длина", len(data))
 		return data, nil
 	}
 
