@@ -3,15 +3,12 @@ package cache
 import (
 	"log/slog"
 	"sync"
-	"time"
 )
 
 type Cache struct {
 	logger *slog.Logger
 	mu     sync.RWMutex
 	data   []byte
-	//ttl time.Duration
-	// expiresAt time.Time
 }
 
 func New(logger *slog.Logger) *Cache {
@@ -23,23 +20,12 @@ func New(logger *slog.Logger) *Cache {
 }
 
 func (c *Cache) Set(data []byte) {
-	if c == nil {
-		panic("🔴 cache is nil!")
-		// return
-	}
-
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	c.data = data
 }
 
 func (c *Cache) Get() ([]byte, bool) {
-
-	if c == nil {
-		panic("🔴 cache is nil!")
-		// return nil, false
-	}
-
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -49,15 +35,4 @@ func (c *Cache) Get() ([]byte, bool) {
 	}
 
 	return c.data, true
-}
-
-// from utc+7
-func (c *Cache) CalculateMidnightUtc7() time.Time {
-	loc := time.FixedZone("UTC+7", 7*60*60)
-	now := time.Now().In(loc)
-
-	return time.Date(
-		now.Year(), now.Month(), now.Day()+1,
-		0, 0, 0, 0, loc,
-	)
 }

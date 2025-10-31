@@ -10,7 +10,7 @@ import (
 )
 
 // ищет файл текущего месяца в каталоге PATH_SCHEDULES
-func SearchCurrentMonthScheduleFile(path string) (string, error) {
+func searchCurrentMonthScheduleFile(path string) (string, error) {
 	files, err := os.ReadDir(path)
 	if err != nil {
 		slog.Error("Не удалось получить список файлов", "error", err)
@@ -31,7 +31,7 @@ func SearchCurrentMonthScheduleFile(path string) (string, error) {
 // возвращает полный путь до файла
 func FullPathToMonthScheduleFile() (string, error) {
 	path := os.Getenv("PATH_SCHEDULES")
-	filename, err := SearchCurrentMonthScheduleFile(path)
+	filename, err := searchCurrentMonthScheduleFile(path)
 	if err != nil {
 		slog.Error("Файл не найден", "error", err)
 		return "", err

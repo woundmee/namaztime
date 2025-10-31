@@ -29,7 +29,7 @@ func New(logger *slog.Logger, cache *cache.Cache, url string) *Namaz {
 // ежедневное обновление кеша в 00:00
 func (n *Namaz) StartDailyUpdateCache() {
 	now := time.Now()
-	midnight := n.cache.CalculateMidnightUtc7()
+	midnight := calculateMidnightUtc7()
 
 	if !midnight.After(now) {
 		midnight = midnight.Add(24 * time.Hour)
@@ -78,7 +78,7 @@ func (n *Namaz) todayDataCache() ([]byte, error) {
 	}
 
 	if data, ok := n.cache.Get(); ok {
-		// n.logger.Info("данные найдены в кеше", "длина", len(data))
+		// n.logger.Info("данные найдены в кэше", "длина", len(data))
 		return data, nil
 	}
 
@@ -130,4 +130,15 @@ func (n *Namaz) todayScheduleHttp(url string) (*http.Response, error) {
 
 	n.logger.Info("данные получены!", "status code", resp.StatusCode)
 	return resp, nil
+}
+
+// from utc+7
+func calculateMidnightUtc7() time.Time {
+	loc := time.FixedZone("UTC+7", 7*60*60)
+	now := time.Now().In(loc)
+
+	return time.Date(
+		now.Year(), now.Month(), now.Day()+1,
+		0, 0, 0, 0, loc,
+	)
 }

@@ -34,18 +34,12 @@ func (h *Handler) GetNamazDataHandler(c echo.Context) error {
 	fp, err := pkg.FullPathToMonthScheduleFile()
 	if err != nil {
 		h.logger.Error("Не удалось получить полный путь до файла", "error", err)
-		// return c.JSON(http.StatusInternalServerError, map[string]string{
-		// 	"error": "Не удалось получить полный путь до файла",
-		// })
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Не удалось получить полный путь до файла")
 	}
 
 	fr, err := h.namazData.NamazDataMonth(fp)
 	if err != nil {
 		h.logger.Error("Ошибка получения расписания намазов за месяц", "error", err, "http", http.StatusInternalServerError)
-		// return c.JSON(http.StatusInternalServerError, map[string]string{
-		// 	"error": "Ошибка получения расписания намазов за месяц",
-		// })
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Ошибка получения расписания намазов за месяц")
 	}
 
@@ -59,27 +53,18 @@ func (h *Handler) GetNamazDataFilteredHandler(c echo.Context) error {
 	day, err := pkg.CurrentDayUtc7Int()
 	if err != nil {
 		h.logger.Error("Не удалось получить текущий день", "error", err)
-		// return c.JSON(http.StatusInternalServerError, map[string]string{
-		// 	"error": "Не удалось получить текущий день",
-		// })
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Не удалось получить текущий день")
 	}
 
 	fp, err := pkg.FullPathToMonthScheduleFile()
 	if err != nil {
 		h.logger.Error("Не удалось получить полный путь до файла", "error", err)
-		// return c.JSON(http.StatusInternalServerError, map[string]string{
-		// 	"error": "Не удалось получить полный путь до файлаь",
-		// })
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Не удалось получить полный путь до файла")
 	}
 
 	res, err := h.namazData.NamazDataToday(day, fp)
 	if err != nil {
 		h.logger.Error("Не удалось получить расписание намазов за текущий день", "error", err)
-		// return c.JSON(http.StatusInternalServerError, map[string]string{
-		// 	"error": "Не удалось получить расписание намазов за текущий день",
-		// })
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Не удалось получить расписание намазов за текущий день")
 	}
 
