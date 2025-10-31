@@ -8,46 +8,39 @@
 
 1. Склонируйте репозиторий
 
-```bash
-git clone https://github.com/woundmee/namaztime-api.git
+```sh
+git clone https://github.com/woundmee/namaztime.git
 ```
 
 2. Отредактируйте `main.go` в обоих модулях. Удалите следующие строчки, чтобы избавиться от привязки к `.env` файлу.
 ```go
-func main() {
-  err := godotenv.Load()
-	if err != nil {
-		panic("не удалось загрузить переменные окружения")
-	}
-  
-  // other code...
+err := godotenv.Load()
+if err != nil {
+  panic("не удалось загрузить переменные окружения")
 }
+
 ```
 
 3. Создайте файл `.env` (в обоих модулях) и задайте значения для будущих переменных окружения. Пример того, как должен выглядеть `.env`, приведен в `.env.template`
 
 4. Создайте следующие файлы
-```bash
+```sh
 touch ./api/api.log
 touch ./api/schedules/  # сюда сложить файлы расписаний: 1-12.csv
 touch ./bot/bot.log
 touch ./bot/users.db
 ```
 
-5. Установите и настройте Nginx на хосте
-```bash
-apt install nginx
-
-```
-Скопируйте файл конфигурации из проекта, который лежит по пути `configs/init/nginx.conf`, по пути `/etc/nginx/sites-available/` следующим образом:
-```bash
+5. Установите и настройте Nginx на хосте. Затем скопируйте файл конфигурации из проекта, который лежит по пути `./configs/init/nginx.conf`, в `/etc/nginx/sites-available/` следующим образом:
+```sh
+sudo apt install nginx
 cat ./configs/init/nginx.conf > /etc/nginx/sites-available/default  # или your_domain_name
-systemctl restart nginx
+sudo systemctl restart nginx
 ```
 
 6. Установите docker-compose, соберите и запустите проект
 
-```bash
+```sh
 # выполнить внутри каталога, где находится compose.yml
 sudo apt install docker-compose
 sudo docker-compose up --build -d
@@ -76,7 +69,7 @@ sudo docker-compose up --build -d
 - Запрос для получения расписания за текущий день: `GET /namaztime/today`
 - Запрос для получения расписания за весь месяц: `GET /namaztime/month`
 
-Пример ответа запроса `GET /namaztime/today`:
+Пример ответа `GET /namaztime/today`:
 ```json
 {
   "Day": "3",
