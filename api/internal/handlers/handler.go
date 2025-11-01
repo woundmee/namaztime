@@ -31,13 +31,7 @@ func sendHttpJsonResponse(c echo.Context, httpStatus int, key, value string) err
 
 // note: HTTP: GET-request
 func (h *Handler) GetNamazDataHandler(c echo.Context) error {
-	fp, err := pkg.FullPathToMonthScheduleFile()
-	if err != nil {
-		h.logger.Error("Не удалось получить полный путь до файла", "error", err)
-		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Не удалось получить полный путь до файла")
-	}
-
-	fr, err := h.namazData.NamazDataMonth(fp)
+	fr, err := h.namazData.NamazDataMonth()
 	if err != nil {
 		h.logger.Error("Ошибка получения расписания намазов за месяц", "error", err, "http", http.StatusInternalServerError)
 		sendHttpJsonResponse(c, http.StatusInternalServerError, "error", "Ошибка получения расписания намазов за месяц")

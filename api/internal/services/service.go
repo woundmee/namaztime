@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"namaztimeApi/internal/cache"
 	"namaztimeApi/models"
+	"namaztimeApi/pkg"
 	"os"
 	"strconv"
 	"time"
@@ -14,24 +16,65 @@ import (
 // здесь будут сервисы (бизнес-логика).
 
 type NamazData interface {
-	NamazDataMonth(path string) ([]models.NamazTime, error)
+	NamazDataMonth() ([]models.NamazTime, error)
 	NamazDataToday(day int, path string) (*models.NamazTime, error)
 }
 
 type Service struct {
 	logger *slog.Logger
+	cache  *cache.Cache
 }
 
 // конструктор
-func New(log *slog.Logger) *Service {
+func New(log *slog.Logger, cache *cache.Cache) *Service {
 	return &Service{
 		logger: log,
+		cache:  cache,
+	}
+}
+
+func (s *Service) StartDailyUpdateCache() {
+	s.logger.Info("запускаю горутину ежедневного обновления кэша")
+	for {
+		midnight := s.calculateMidnightUtc7()
+		now := time.Now()
+
+		if !midnight.After(now) {
+			midnight = midnight.Add(24 * time.Hour)
+		}
+
+		// вычисляю остаток времени до полуночи
+		sleepDuration := midnight.Sub(now)
+		s.logger.Info("ожидание следующей полуночи", "длительность", sleepDuration)
+		time.Sleep(sleepDuration)
+
+		s.logger.Info("обновление кэша в 00:00")
+
+		data, err := s.NamazDataMonth()
+		if err != nil {
+			s.logger.Error("ошибка получения месячных данных", "error", err)
+			continue
+		}
+
+		s.cache.Set(data)
+		s.logger.Info("кэш успешно обновлен!", "time", time.Now().Format(time.DateTime), "ContentLength", len(data))
 	}
 }
 
 // получить расписание намазов за месяц
-func (s *Service) NamazDataMonth(path string) ([]models.NamazTime, error) {
-	file, err := os.Open(path)
+func (s *Service) NamazDataMonth() ([]models.NamazTime, error) {
+
+	if cacheData, ok := s.cache.Get(); ok {
+		return cacheData, nil
+	}
+
+	fullpath, err := pkg.FullPathToMonthScheduleFile()
+	if err != nil {
+		s.logger.Error("не удалось получить полный путь до файла с расписаниями", "error", err)
+		return nil, err
+	}
+
+	file, err := os.Open(fullpath)
 	if err != nil {
 		s.logger.Error("", "error", err)
 		return nil, fmt.Errorf("не удалось открыть файл: %w", err)
@@ -71,6 +114,9 @@ func (s *Service) NamazDataMonth(path string) ([]models.NamazTime, error) {
 			Isha:    s.timeFormatted(record[6]),
 		})
 	}
+
+	s.cache.Set(data)
+	s.logger.Info("данные записаны в кэш", "ContentLength", len(data))
 	return data, nil
 }
 
@@ -88,7 +134,7 @@ func (s *Service) timeFormatted(t string) string {
 func (s *Service) NamazDataToday(day int, path string) (*models.NamazTime, error) {
 	s.logger.Info("получаю расписание за месяц для дальнейшей обработки...")
 
-	data, err := s.NamazDataMonth(path)
+	data, err := s.NamazDataMonth()
 	if err != nil {
 		s.logger.Error("ошибка получения данных", "error", err)
 		return nil, fmt.Errorf("ошибка получения данных: %v", err)
@@ -104,4 +150,28 @@ func (s *Service) NamazDataToday(day int, path string) (*models.NamazTime, error
 
 	s.logger.Error("расписание на текущий день не найдено", "day", day)
 	return nil, fmt.Errorf("данные за день %d не найдены", day)
+}
+
+// from utc+7
+func (s *Service) calculateMidnightUtc7() time.Time {
+	// loc := time.FixedZone("UTC+7", 7*60*60)
+	now := time.Now().In(s.timeZone())
+	return time.Date(
+		now.Year(), now.Month(), now.Day()+1,
+		0, 0, 0, 0, s.timeZone(),
+	)
+}
+
+func (s *Service) timeZone() *time.Location {
+	timezone := os.Getenv("TIMEZONE")
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		s.logger.Error("не удалось задать timezone", "error", err)
+		// loc = time.FixedZone("UTC+7", 7*3600)
+		// n.logger.Warn("timezone задана принудительно", "timezone", loc)
+		// return loc
+		return nil
+	}
+
+	return loc
 }

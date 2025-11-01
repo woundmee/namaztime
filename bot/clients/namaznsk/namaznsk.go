@@ -46,7 +46,7 @@ func (n *Namaz) StartDailyUpdateCache() {
 		data, err := n.todayScheduleRead()
 		if err != nil {
 			n.logger.Error("ошибка обновления кеша", "error", err)
-			return
+			continue
 		}
 
 		// cache update
@@ -75,12 +75,11 @@ func (n *Namaz) TodaySchedule() (entities.NamazData, error) {
 func (n *Namaz) todayDataCache() ([]byte, error) {
 	if n.cache == nil {
 		msg := "кэш не инициализирован"
-		n.logger.Error(msg)
+		n.logger.Error(msg, "cache", n.cache)
 		return nil, errors.New(msg)
 	}
 
 	if data, ok := n.cache.Get(); ok {
-		// n.logger.Info("данные найдены в кэше", "длина", len(data))
 		return data, nil
 	}
 

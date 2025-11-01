@@ -20,7 +20,7 @@ func searchCurrentMonthScheduleFile(path string) (string, error) {
 	currentMonthInt := int(time.Now().Month())
 	for _, file := range files {
 		if strings.Contains(file.Name(), strconv.Itoa(currentMonthInt)) {
-			slog.Info("Файл найден", "filename", file.Name())
+			slog.Info("файл найден", "filename", file.Name())
 			return file.Name(), nil
 		}
 	}

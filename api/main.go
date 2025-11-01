@@ -1,6 +1,7 @@
 package main
 
 import (
+	"namaztimeApi/internal/cache"
 	"namaztimeApi/internal/configs/slogger"
 	"namaztimeApi/internal/handlers"
 	"namaztimeApi/internal/services"
@@ -20,14 +21,24 @@ func main() {
 
 	logFile := os.Getenv("API_LOG_FILE")
 
+	// init logger
 	logger, err := slogger.Init(logFile)
 	if err != nil {
 		panic("Не удалось инициализировать логгер: " + err.Error())
 	}
-	service := services.New(logger)
+
+	// init cache
+	cache := cache.New(logger)
+
+	// init service
+	service := services.New(logger, cache)
+	go service.StartDailyUpdateCache()
+
+	// init handler
 	handler := handlers.New(logger, service)
 
-	logger.Info("Создаю новый echo-сервер")
+	// init echo server
+	logger.Info("cоздаю новый echo-сервер")
 	e := echo.New()
 	e.Use(middleware.CORS())
 	e.Use(middleware.Logger())
@@ -36,6 +47,6 @@ func main() {
 	e.GET("/namaztime/month", handler.GetNamazDataHandler)
 	e.GET("/namaztime/today", handler.GetNamazDataFilteredHandler)
 
-	logger.Info("Начинаю запуск приложения", "address", os.Getenv("ADDRESS"))
+	logger.Info("начинаю запуск приложения", "address", os.Getenv("ADDRESS"))
 	e.Start(os.Getenv("ADDRESS"))
 }

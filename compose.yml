@@ -10,7 +10,8 @@ services:
     build:
       context: ./api
       dockerfile: dockerfile
-    # environment:
+    environment:
+      - TZ=Europe/Moscow
     #   - http_proxy=http://username:password@ip:port
     #   - https_proxy=http://username:password@ip:port
     volumes:
@@ -28,7 +29,8 @@ services:
       context: ./bot
       dockerfile: dockerfile
     working_dir: /bot
-    # environment:
+    environment:
+      - TZ=Europe/Moscow
     #   - http_proxy=http://username:password@ip:port
     #   - https_proxy=http://username:password@ip:port
     volumes:
