@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"os"
 	"telegramBot/clients/entities"
 	"telegramBot/internal/cache"
 	"time"
@@ -28,29 +29,30 @@ func New(logger *slog.Logger, cache *cache.Cache, url string) *Namaz {
 
 // ежедневное обновление кеша в 00:00
 func (n *Namaz) StartDailyUpdateCache() {
-	now := time.Now()
-	midnight := calculateMidnightUtc7()
+	for {
+		now := time.Now()
+		midnight := n.calculateMidnightUtc7()
 
-	if !midnight.After(now) {
-		midnight = midnight.Add(24 * time.Hour)
+		if !midnight.After(now) {
+			midnight = midnight.Add(24 * time.Hour)
+		}
+
+		// вычисляю остаток времени до полуночи
+		sleepDuration := midnight.Sub(now)
+		n.logger.Info("ожидание следующей полуночи", "длительность", sleepDuration)
+		time.Sleep(sleepDuration)
+
+		n.logger.Info("обновление кэша в 00:00")
+		data, err := n.todayScheduleRead()
+		if err != nil {
+			n.logger.Error("ошибка обновления кеша", "error", err)
+			return
+		}
+
+		// cache update
+		n.cache.Set(data)
+		n.logger.Info("кэш успешно обновлен!", "time", now.Format("2006-01-02 15:04"))
 	}
-
-	// вычисляю остаток времени до полуночи
-	sleepDuration := midnight.Sub(now)
-	n.logger.Info("ожидание следующей полуночи", "длительность", sleepDuration)
-	time.Sleep(sleepDuration)
-	n.logger.Info("обновление кэша в 00:00")
-
-	data, err := n.todayScheduleRead()
-	if err != nil {
-		n.logger.Error("ошибка обновления кеша", "error", err)
-		return
-	}
-
-	// cache update
-	n.cache.Set(data)
-	n.logger.Info("кэш успешно обновлен!", "time", now.Format("2006-01-02 15:04"))
-
 }
 
 func (n *Namaz) TodaySchedule() (entities.NamazData, error) {
@@ -133,12 +135,25 @@ func (n *Namaz) todayScheduleHttp(url string) (*http.Response, error) {
 }
 
 // from utc+7
-func calculateMidnightUtc7() time.Time {
-	loc := time.FixedZone("UTC+7", 7*60*60)
-	now := time.Now().In(loc)
-
+func (n *Namaz) calculateMidnightUtc7() time.Time {
+	// loc := time.FixedZone("UTC+7", 7*60*60)
+	now := time.Now().In(n.timeZone())
 	return time.Date(
 		now.Year(), now.Month(), now.Day()+1,
-		0, 0, 0, 0, loc,
+		0, 0, 0, 0, n.timeZone(),
 	)
+}
+
+func (n *Namaz) timeZone() *time.Location {
+	timezone := os.Getenv("TIMEZONE")
+	loc, err := time.LoadLocation(timezone)
+	if err != nil {
+		n.logger.Error("не удалось задать timezone", "error", err)
+		// loc = time.FixedZone("UTC+7", 7*3600)
+		// n.logger.Warn("timezone задана принудительно", "timezone", loc)
+		// return loc
+		return nil
+	}
+
+	return loc
 }

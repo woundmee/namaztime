@@ -33,7 +33,7 @@ func New(logger *slog.Logger, botKey tgbotapi.BotAPI, namaz namaznsk.Namaz, serv
 
 func (h *Handler) Start() {
 	fmt.Printf("Бот @%s запущен!\n", h.bot.Self.UserName)
-	h.logger.Info("Бот запущен", "name", "@"+h.bot.Self.UserName)
+	h.logger.Info("бот запущен", "name", "@"+h.bot.Self.UserName)
 
 	// go h.service.StartNamazNotifier()
 

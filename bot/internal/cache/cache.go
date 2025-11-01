@@ -22,7 +22,8 @@ func New(logger *slog.Logger) *Cache {
 func (c *Cache) Set(data []byte) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	c.data = data
+	// c.data = data
+	c.data = append([]byte(nil), data...)
 }
 
 func (c *Cache) Get() ([]byte, bool) {

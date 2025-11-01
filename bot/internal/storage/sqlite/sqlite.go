@@ -117,7 +117,7 @@ func (d *Database) DeleteUser(chatID int64) error {
 	if rowsAffected == 0 {
 		d.logger.Warn("запись для удаления не найдена", "chatID", chatID)
 	} else {
-		d.logger.Info("Пользователь удален из БД", "chatID", chatID)
+		d.logger.Info("пользователь удален из БД", "chatID", chatID)
 	}
 
 	return nil
